@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apteryx.Routing.Role.Authority", "Apteryx.Routing.Role.Authority\Apteryx.Routing.Role.Authority.csproj", "{E2A31A5D-3D94-4C70-8C8F-4072BB5B95FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EAF1FAFF-F269-4844-B877-5AD2FC75D31A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apteryx.WebApi", "Samples\Apteryx.WebApi\Apteryx.WebApi.csproj", "{67166EDB-2104-403E-BF3B-F3D7A094C03E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6A06450-B12B-4254-8060-8FDBE29E7FC6}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2A31A5D-3D94-4C70-8C8F-4072BB5B95FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2A31A5D-3D94-4C70-8C8F-4072BB5B95FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2A31A5D-3D94-4C70-8C8F-4072BB5B95FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2A31A5D-3D94-4C70-8C8F-4072BB5B95FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67166EDB-2104-403E-BF3B-F3D7A094C03E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67166EDB-2104-403E-BF3B-F3D7A094C03E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67166EDB-2104-403E-BF3B-F3D7A094C03E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67166EDB-2104-403E-BF3B-F3D7A094C03E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{67166EDB-2104-403E-BF3B-F3D7A094C03E} = {EAF1FAFF-F269-4844-B877-5AD2FC75D31A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC0A057B-EDFC-45BA-AEA8-AFA2B87DE06D}
+	EndGlobalSection
+EndGlobal
