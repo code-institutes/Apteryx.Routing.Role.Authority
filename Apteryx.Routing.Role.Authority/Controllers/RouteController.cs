@@ -22,12 +22,14 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     public class RouteController : ControllerBase
     {
         private readonly ApteryxDbContext _db;
+        private readonly ApteryxInitializeDataService _initDataService;
         private readonly IActionDescriptorCollectionProvider actionDescriptor;
 
-        public RouteController(IActionDescriptorCollectionProvider collectionProvider, ApteryxDbContext mongoDbContext)
+        public RouteController(IActionDescriptorCollectionProvider collectionProvider, ApteryxDbContext mongoDbContext, ApteryxInitializeDataService initializeDataService)
         {
-            _db = mongoDbContext;
+            this._db = mongoDbContext;
             this.actionDescriptor = collectionProvider;
+            this._initDataService= initializeDataService;
         }
 
         [HttpPost]
@@ -185,76 +187,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<ResultGroupRouteModel>>))]
         public async Task<ActionResult<ApteryxResult<List<Route>>>> GetRefresh()
         {
-            List<Route> arrRoutes = new List<Route>();
-            foreach (var action in actionDescriptor.ActionDescriptors.Items)
-            {
-
-                var ctrlFullName = string.Empty;
-                var groupName = string.Empty;
-                var actFullName = string.Empty;
-                var httpMethods = "GET,POST,PUT,DELETE,PATCH";
-
-                var ctrlActDesc = (ControllerActionDescriptor)action;
-
-                if (action.ActionConstraints.Any())
-                {
-                    var methodActionConstraint = action.ActionConstraints.First(f=>f.GetType()==typeof(HttpMethodActionConstraint)) as HttpMethodActionConstraint;
-                    httpMethods = string.Join(',', methodActionConstraint.HttpMethods.Select(s => s));
-                }
-
-                ctrlFullName = ctrlActDesc.ControllerTypeInfo.FullName;
-                actFullName = action.DisplayName;
-
-                var ctrlSwaggerTagAttr = action.EndpointMetadata.FirstOrDefault(f => f.GetType() == typeof(SwaggerTagAttribute));
-                if (ctrlSwaggerTagAttr != null)
-                    groupName = ((SwaggerTagAttribute)ctrlSwaggerTagAttr).Description;
-                else
-                    groupName = ctrlActDesc.ControllerName;
-
-                var apiRoleDescObject = ctrlActDesc.EndpointMetadata.FirstOrDefault(f => f.GetType() == typeof(ApiRoleDescriptionAttribute));
-
-                if (apiRoleDescObject != null)
-                {
-                    var apiRoleDesc = (ApiRoleDescriptionAttribute)apiRoleDescObject;
-
-                    arrRoutes.Add(new Route()
-                    {
-                        CtrlFullName = ctrlFullName,
-                        CtrlName = groupName,
-                        Path = $"/{ctrlActDesc.AttributeRouteInfo.Template}",
-                        Method = httpMethods,
-                        AddType = AddTypes.程序,
-                        Tag = apiRoleDesc.Tag,
-                        Name = apiRoleDesc.Name,
-                        Description = apiRoleDesc.Description,
-                        IsMustHave = apiRoleDesc.IsMustHave
-                    });
-                }
-            }
-
-            foreach (var route in _db.Routes.Where(w => w.AddType == AddTypes.程序).ToList())
-            {
-                var validRoute = arrRoutes.FirstOrDefault(a => a.CtrlFullName == route.CtrlFullName && a.Tag == route.Tag);
-                if (validRoute != null)
-                {
-                    route.CtrlFullName = validRoute.CtrlFullName;
-                    route.Method = validRoute.Method;
-                    route.Name = validRoute.Name;
-                    route.Description = validRoute.Description;
-                    route.Path = validRoute.Path;
-                    await _db.Routes.ReplaceOneAsync(r => r.Id == route.Id, route);
-                    arrRoutes.Remove(validRoute);
-                }
-                else
-                {
-                    await _db.Routes.DeleteOneAsync(d => d.Id == route.Id);
-                    //将路由从所有角色中删除
-                    await _db.Roles.UpdateManyAsync(u => u.RouteIds.Contains(route.Id), Builders<Role>.Update.Pull(p => p.RouteIds, route.Id));
-                }
-            }
-
-            if (arrRoutes.Any())
-                await _db.Routes.AddManyAsync(arrRoutes);
+            _initDataService.RefreshRoute();
 
             var item = _db.Routes.AsQueryable().ToList().GroupBy(g => g.CtrlName).Select(s => new ResultGroupRouteModel()
             {

@@ -47,15 +47,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.账号或密码错误, null, typeof(ApteryxResult))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
-            //创建账户
-            var act = await _db.SystemAccounts.FindAllAsync();
-            if (!act.Any())
-                await _db.SystemAccounts.AddAsync(new SystemAccount()
-                {
-                    Email = "wyspaces@outlook.com",
-                    Password = "admin1234".ToSHA1(),
-                    IsSuper = true
-                });
+            
 
             var pwd = model.Password.ToSHA1();
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);

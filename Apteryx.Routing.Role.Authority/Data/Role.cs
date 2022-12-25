@@ -1,9 +1,4 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Apteryx.Routing.Role.Authority
 {
@@ -12,5 +7,7 @@ namespace Apteryx.Routing.Role.Authority
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> RouteIds { get; set; }
+        public List<string>? OwnRoleIds { get; set; }
+        public AddTypes AddType { get; set; } = AddTypes.人工;
     }
 }

@@ -134,6 +134,7 @@ namespace Apteryx.Routing.Role.Authority
                 });
                 //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Apteryx.Routing.Role.Authority.xml"));
             });
+            services.AddScoped<ApteryxInitializeDataService>();
             return services;
         }
     }
