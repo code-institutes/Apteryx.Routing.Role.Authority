@@ -1,5 +1,6 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Apteryx.Routing.Role.Authority;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -42,7 +43,7 @@ builder.Services.AddApteryxAuthority(new ApteryxConfig()
     MongoDBOptions = new MongoDBOptions()
     {
         //更改成你的MongoDb连接
-        ConnectionString = "mongodb://root:pwd@ip:port/apteryx_authority?authSource=admin"
+        ConnectionString = builder.Configuration.GetConnectionString("MongoDbConnection")
     }
 });
 
