@@ -1,7 +1,6 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -74,13 +73,22 @@ namespace Apteryx.Routing.Role.Authority
                 var route = _db.Routes.FindOne(f => f.Method == method && f.Path == template);
                 if (route != null)
                 {
-                    //var roleRoute = _db.RoleRoutes.FindOne(f => f.RoleId == systemAccount.RoleId && f.RouteId == route.Id);
                     var roleRoute = _db.Roles.FindOne(f => f.Id == systemAccount.RoleId && f.RouteIds.Contains(route.Id));
                     if (roleRoute != null)
+                    {
                         return;
+                    }
+                    else
+                    {
+                        var role = _db.Roles.FindOne(systemAccount.RoleId);
+                        context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.权限不足, $"角色：“{role.Name}”无权访问当前路由！")) { StatusCode = 200 };
+                        return;
+                    }
                 }
-                context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.权限不足)) { StatusCode = 200 };
-                return;
+                else
+                {
+                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.路由不存在, $"路由：“{template}”在数据库中未找到！")) { StatusCode = 200 };
+                }
             }
             return;
         }

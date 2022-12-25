@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Apteryx.Routing.Role.Authority;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Apteryx.WebApi.Controllers
 {

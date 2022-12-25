@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Apteryx.Routing.Role.Authority
+﻿namespace Apteryx.Routing.Role.Authority
 {
     public abstract class BaseApteryxResult : IApteryxResult
     {

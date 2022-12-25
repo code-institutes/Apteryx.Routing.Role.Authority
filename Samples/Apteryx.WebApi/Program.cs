@@ -1,6 +1,5 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Apteryx.Routing.Role.Authority;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 

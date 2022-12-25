@@ -1,5 +1,4 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
-
 namespace Apteryx.Routing.Role.Authority
 {
     public sealed class ApteryxConfig

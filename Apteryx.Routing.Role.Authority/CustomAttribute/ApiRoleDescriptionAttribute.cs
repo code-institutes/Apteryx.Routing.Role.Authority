@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Apteryx.Routing.Role.Authority
+﻿namespace Apteryx.Routing.Role.Authority
 {
     /// <summary>
     /// 接口描述
@@ -40,11 +38,9 @@ namespace Apteryx.Routing.Role.Authority
         /// 用于描述API功能
         /// </summary>
         public string? Description { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsMustHave { get; set; }
-        ///// <summary>
-        ///// 索引(用于排序)
-        ///// </summary>
-        //public int Index { get; set; }
     }
 }

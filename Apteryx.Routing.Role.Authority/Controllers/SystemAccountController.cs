@@ -47,8 +47,6 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.账号或密码错误, null, typeof(ApteryxResult))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
-            
-
             var pwd = model.Password.ToSHA1();
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
             if (account == null)
