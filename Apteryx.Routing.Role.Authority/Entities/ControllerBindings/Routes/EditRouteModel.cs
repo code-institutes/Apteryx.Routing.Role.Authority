@@ -11,6 +11,6 @@ namespace Apteryx.Routing.Role.Authority
         /// 路由ID
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
     }
 }

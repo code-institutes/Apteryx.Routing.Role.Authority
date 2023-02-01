@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Apteryx.Routing.Role.Authority
 {
-    public class SystemAccount:BaseMongoEntity
+    public class SystemAccount : BaseMongoEntity
     {
         /// <summary>
         /// 
@@ -30,5 +30,9 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         [JsonIgnore]
         public bool IsSuper { get; set; } = false;
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public bool State { get; set; } = true;
     }
 }

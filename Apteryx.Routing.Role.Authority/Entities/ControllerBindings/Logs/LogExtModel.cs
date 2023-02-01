@@ -5,12 +5,12 @@
         /// <summary>
         /// 日志ID
         /// </summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// 表名
         /// </summary>
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
         /// <summary>
         /// 行为
@@ -20,7 +20,7 @@
         /// <summary>
         /// 方法/动作名
         /// </summary>
-        public string ActionName { get; set; }
+        public string? ActionName { get; set; }
 
         /// <summary>
         /// 记录时间
@@ -30,6 +30,6 @@
         /// <summary>
         /// 管理员信息
         /// </summary>
-        public ResultSystemAccountRoleModel AccountInfo { get; set; }
+        public ResultSystemAccountRoleModel? AccountInfo { get; set; }
     }
 }

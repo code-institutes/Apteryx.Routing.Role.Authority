@@ -3,14 +3,14 @@
 namespace Apteryx.Routing.Role.Authority
 {
     /// <summary>
-    /// 编辑角色模型
+    /// 修改账户状态模型
     /// </summary>
-    public sealed class EditRoleModel:AddRoleModel
+    public class EditStateSystemAccountModel
     {
         /// <summary>
-        /// 角色ID
+        /// 账户ID
         /// </summary>
-        [Required(ErrorMessage ="“{0}”必填")]
+        [Required(ErrorMessage = "“{0}”必填")]
         public string? Id { get; set; }
     }
 }

@@ -11,17 +11,17 @@ namespace Apteryx.Routing.Role.Authority
         /// 角色名
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 描述
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// 路由ID
         /// </summary>
         [RequiredItem]
-        public IEnumerable<string> RouteIds { get; set; }
+        public IEnumerable<string>? RouteIds { get; set; }
     }
 }

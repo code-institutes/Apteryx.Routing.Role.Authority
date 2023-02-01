@@ -11,24 +11,24 @@ namespace Apteryx.Routing.Role.Authority
         /// 功能说明
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string CtrlName { get; set; }
+        public string? CtrlName { get; set; }
 
         /// <summary>
         /// 行为
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string Method { get; set; }
+        public string? Method { get; set; }
 
         /// <summary>
         /// 接口描述
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// 相对路径
         /// </summary>
         [Required(ErrorMessage ="“{0}”必填")]
-        public string Path { get; set; }
+        public string? Path { get; set; }
     }
 }

@@ -27,6 +27,10 @@ namespace Apteryx.Routing.Role.Authority
             //刷新路由
             RefreshRoute();
 
+            var route = _db.Routes.FindAll();
+
+            var routeIds = route.Select(r => r.Id).ToList();
+
             //创建账户
             var act = _db.SystemAccounts.FindAll();
             if (!act.Any())
@@ -34,7 +38,7 @@ namespace Apteryx.Routing.Role.Authority
                 var role = _db.Roles.FindOne(f => f.Name == "超管" && f.AddType == AddTypes.程序);
                 if (role == null)
                 {
-                    var route = _db.Routes.FindAll();
+
 
                     role = new Role()
                     {
@@ -42,18 +46,23 @@ namespace Apteryx.Routing.Role.Authority
                         AddType = AddTypes.程序,
                         Description = "系统默认超级管理员",
                         Id = ObjectId.GenerateNewId().ToString(),
-                        RouteIds = route.Select(r => r.Id).ToList()
+                        RouteIds = routeIds
                     };
                     _db.Roles.Add(role);
                 }
 
                 _db.SystemAccounts.Add(new SystemAccount()
                 {
-                    Email = "admin@i21st.com",
+                    Email = "wyspaces@outlook.com",
                     Password = "admin1234".ToSHA1(),
                     IsSuper = true,
                     RoleId = role.Id
                 });
+            }
+            else
+            {
+                var role = _db.Roles.FindOne(f => f.Name == "超管" && f.AddType == AddTypes.程序);
+                _db.Roles.UpdateOne(u => u.Id == role.Id, Builders<Role>.Update.Set(s => s.RouteIds, routeIds));
             }
         }
 
@@ -63,7 +72,6 @@ namespace Apteryx.Routing.Role.Authority
             List<Route> arrRoutes = new List<Route>();
             foreach (var action in actionDescriptor.ActionDescriptors.Items)
             {
-
                 var ctrlFullName = string.Empty;
                 var groupName = string.Empty;
                 var actFullName = string.Empty;

@@ -12,11 +12,11 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         [EmailAddress]
         [Required(ErrorMessage = "“{0}”必填")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         /// <summary>
         /// 密码
         /// </summary>
         [Required(ErrorMessage = "“{0}”必填")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
 }

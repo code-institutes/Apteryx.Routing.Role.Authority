@@ -54,6 +54,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账号或密码错误));
             }
 
+            if (!account.State)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户已被禁用));
+
             var role = await _db.Roles.FindOneAsync(f => f.Id == account.RoleId);
 
             var token = new JwtBuilder()
@@ -151,14 +154,41 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (check != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
-            var result = await _db.SystemAccounts.WhereUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
-                .Update
-                .Set(s => s.Email, model.NewEmail)
-                .Set(s => s.Password, model.NewPassword.ToSHA1()));
-            if (result.ModifiedCount <= 0)
-                return Ok(ApteryxResultApi.Susuccessful("没有任何变更"));
+            account.Email = model.NewEmail.Trim();
+            account.Password = model.NewPassword.Trim().ToSHA1();
 
-            await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码", account.ToJson(), _db.SystemAccounts.FindOne(f => f.Id == account.Id).ToJson()));
+            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
+                .Update
+                .Set(s => s.Email, account.Email)
+                .Set(s => s.Password, account.Password));
+
+            await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码",result.ToJson(), account.ToJson()));
+            return Ok(ApteryxResultApi.Susuccessful());
+        }
+
+        [HttpPut("state")]
+        [SwaggerOperation(
+            Summary = "启用/禁用",
+            OperationId = "State",
+            Tags = new[] { "SystemAccount" }
+        )]
+        public async Task<IActionResult> PutState([FromBody] EditStateSystemAccountModel model)
+        {
+            var id = model.Id;
+            var accountId = HttpContext.GetAccountId();
+
+            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
+            if (account == null)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
+
+            if (account.IsSuper == true)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
+
+            account.State = !account.State;
+
+            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == accountId, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
+            await _db.Logs.AddAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "启用/禁用账户", result.ToJson(), account.ToJson()));
+
             return Ok(ApteryxResultApi.Susuccessful());
         }
 

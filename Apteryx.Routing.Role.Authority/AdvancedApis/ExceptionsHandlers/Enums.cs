@@ -3,6 +3,7 @@
     public enum ApteryxCodes
     {
         请求成功 = 200,
+        禁止该操作,
 
         Unauthorized = 401,
         权限不足,

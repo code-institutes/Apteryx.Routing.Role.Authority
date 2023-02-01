@@ -8,7 +8,7 @@
         /// <summary>
         /// 系统账户详情
         /// </summary>
-        public SystemAccount Account { get; set; }
+        public SystemAccount? Account { get; set; }
 
         /// <summary>
         /// 

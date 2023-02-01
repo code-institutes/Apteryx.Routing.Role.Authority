@@ -132,7 +132,7 @@ namespace Apteryx.Routing.Role.Authority
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey
                 });
-                //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Apteryx.Routing.Role.Authority.xml"));
+                c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Apteryx.Routing.Role.Authority.xml"));
             });
             services.AddScoped<ApteryxInitializeDataService>();
             return services;

@@ -1,6 +1,7 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Data;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -69,6 +70,12 @@ namespace Apteryx.Routing.Role.Authority
                 var systemAccount = _db.SystemAccounts.FindOne(f => f.Id == accountId);
                 if (systemAccount.IsSuper)
                     return;
+
+                if(!systemAccount.State)
+                {
+                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.账户已被禁用, $"您的账户已被禁用，无法继续使用！")) { StatusCode = 200 };
+                    return;
+                }
 
                 var route = _db.Routes.FindOne(f => f.Method == method && f.Path == template);
                 if (route != null)

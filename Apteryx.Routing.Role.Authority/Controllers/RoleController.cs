@@ -67,6 +67,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{roleId}"));
 
+            if(role.AddType == AddTypes.程序 && role.Name == "超管")
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "禁止操作系统默认角色！"));
+
             if (_db.Roles.FindOne(a => a.Name == model.Name && a.Id != model.Id) != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色已存在, $"角色名：\"{model.Name}\"已存在"));
 
@@ -160,11 +163,11 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{id}"));
 
-            var groupId = ObjectId.GenerateNewId().ToString();
-            var sysAccountId = HttpContext.GetAccountId();
-
             if (role.AddType == AddTypes.程序)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "系统默认角色禁止删除！"));
+
+            var groupId = ObjectId.GenerateNewId().ToString();
+            var sysAccountId = HttpContext.GetAccountId();
 
             await _db.Logs.AddAsync(new Log(sysAccountId, "Role", ActionMethods.删, "删除角色", role.ToJson()));
             foreach (var sysAccount in _db.SystemAccounts.Where(w => w.RoleId == id))
