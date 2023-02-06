@@ -9,7 +9,7 @@
 		<!--<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>-->
 		<PackageProjectUrl>https://github.com/code-institutes/Apteryx.Routing.Role.Authority</PackageProjectUrl>
 		<Copyright>apteryx</Copyright>
-		<PackageVersion>1.0.1-rc-1012</PackageVersion>
+		<PackageVersion>1.0.1-rc-1013</PackageVersion>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
@@ -22,14 +22,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Apteryx.Common.Extend" Version="1.0.0" />
-		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="3.1.0" />
+		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="3.1.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
-		<PackageReference Include="System.Text.Json" Version="7.0.1" />
 		<PackageReference Include="Unchase.Swashbuckle.AspNetCore.Extensions" Version="2.7.1" />
 	</ItemGroup>
 
