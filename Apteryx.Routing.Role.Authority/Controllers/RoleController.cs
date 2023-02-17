@@ -189,7 +189,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("F", "查询")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<Role>>))]
-        public async Task<IActionResult> PostQuery(QueryRoleModel model)
+        public async Task<IActionResult> PostQuery([FromBody]QueryRoleModel model)
         {
             var page = model.Page;
             var limit = model.Limit;
