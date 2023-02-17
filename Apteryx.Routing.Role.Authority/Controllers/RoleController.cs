@@ -188,11 +188,20 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Role" }
         )]
         [ApiRoleDescription("F", "查询")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Role>>))]
-        public async Task<IActionResult> PostQuery()
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<Role>>))]
+        public async Task<IActionResult> PostQuery(QueryRoleModel model)
         {
-            var result = (await _db.Roles.FindAllAsync()).ToList().OrderByDescending(d => d.UpdateTime);
-            return Ok(ApteryxResultApi.Susuccessful(result));
+            var page = model.Page;
+            var limit = model.Limit;
+            var key = model.Key;
+
+            var query = _db.Roles.AsQueryable().AsQueryable();
+
+            if (!string.IsNullOrEmpty(key))
+                query = query.Where(w => w.Name.Contains(key) || w.Description.Contains(key));
+
+            var result = query.OrderByDescending(d => d.Id).ToPageList(page, limit);
+            return Ok(ApteryxResultApi.Susuccessful(new PageList<Role>(result.Count(),result.ToList())));
         }
 
         //[HttpGet("report/usage/{roleId}")]
