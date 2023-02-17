@@ -9,11 +9,11 @@
 		<!--<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>-->
 		<PackageProjectUrl>https://github.com/code-institutes/Apteryx.Routing.Role.Authority</PackageProjectUrl>
 		<Copyright>apteryx</Copyright>
-		<PackageVersion>1.0.1-rc-1015</PackageVersion>
+		<PackageVersion>1.0.1-rc-1018</PackageVersion>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-		<DocumentationFile>Apteryx.Routing.Role.Authority.xml</DocumentationFile>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

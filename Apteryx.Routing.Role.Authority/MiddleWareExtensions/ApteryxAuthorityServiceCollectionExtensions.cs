@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -132,7 +133,8 @@ namespace Apteryx.Routing.Role.Authority
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey
                 });
-                c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Apteryx.Routing.Role.Authority.xml"));
+                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile));
             });
             services.AddScoped<ApteryxInitializeDataService>();
             return services;
