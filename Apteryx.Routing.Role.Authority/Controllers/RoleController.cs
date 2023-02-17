@@ -92,7 +92,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Role" }
         )]
         [ApiRoleDescription("C", "获取拥有权限", isMustHave: true)]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<ResultOwnRouteModel>>))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<ResultOwnRouteModel>))]
         public async Task<IActionResult> GetAuth()
         {
             var accountId = HttpContext.GetAccountId();
