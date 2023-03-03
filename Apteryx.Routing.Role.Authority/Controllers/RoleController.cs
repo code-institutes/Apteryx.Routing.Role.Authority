@@ -200,8 +200,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!string.IsNullOrEmpty(key))
                 query = query.Where(w => w.Name.Contains(key) || w.Description.Contains(key));
 
-            var result = query.OrderByDescending(d => d.Id).ToPageList(page, limit);
-            return Ok(ApteryxResultApi.Susuccessful(new PageList<Role>(result.Count(),result.ToList())));
+            var data = query.OrderByDescending(d => d.Id).ToPageList(page, limit);
+            return Ok(ApteryxResultApi.Susuccessful(data));
         }
 
         //[HttpGet("report/usage/{roleId}")]
