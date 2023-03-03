@@ -139,7 +139,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("C", "修改账户与密码", isMustHave: true)]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
-        public async Task<IActionResult> EditAccountPwd([FromBody] EditPwdSystemAccountModel model)
+        public async Task<IActionResult> PutPwd([FromBody] EditPwdSystemAccountModel model)
         {
             var accountId = HttpContext.GetAccountId();
 
@@ -206,21 +206,17 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var pindex = model.Page;
             var rowCount = model.Limit;
 
-            FilterDefinition<SystemAccount> filter = null;
-            var bf = Builders<SystemAccount>.Filter;
+            var query = _db.SystemAccounts.AsQueryable().AsQueryable();
 
             if (!model.Email.IsNullOrWhiteSpace())
-                filter = bf.Regex(r => r.Email, new BsonRegularExpression(model.Email));
+                query = query.Where(x => x.Email.Contains(model.Email));
 
             if (!model.RoleId.IsNullOrWhiteSpace())
-                filter = bf.Eq(r => r.RoleId, model.RoleId);
+                query = query.Where(x => x.RoleId == model.RoleId);            
 
-            filter = filter ?? bf.Empty;
+            var data = query.OrderByDescending(o=>o.Id).ToPageList(model.Page, model.Limit);
 
-            var count = await _db.SystemAccounts.CountDocumentsAsync(filter);
-            var item = _db.SystemAccounts.Find(filter).Sort(Builders<SystemAccount>.Sort.Descending(d => d.CreateTime)).Skip((pindex - 1) * rowCount).Limit(rowCount).ToList();
-
-            return Ok(ApteryxResultApi.Susuccessful(new PageList<SystemAccount>(count, item)));
+            return Ok(ApteryxResultApi.Susuccessful(data));
         }
     }
 }

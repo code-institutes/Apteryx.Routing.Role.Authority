@@ -8,7 +8,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Apteryx.Routing.Role.Authority.Controllers
 {
+#if !DEBUG
     [Authorize(AuthenticationSchemes = "apteryx")]
+#endif
     [SwaggerTag("日志服务")]
     [Route("cgi-bin/apteryx/log")]
     [Produces("application/json")]
@@ -46,8 +48,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<LogExtModel>>))]
         public async Task<IActionResult> PostQuery([FromBody] QueryLogModel model)
         {
-            var pindex = model.Page;
-            var rowCount = model.Limit;
+            var page = model.Page;
+            var limit = model.Limit;
             var method = model.Method;
             var accountId = model.AccountId;
             var groupId = model.GroupId;
@@ -66,10 +68,26 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!key.IsNullOrWhiteSpace())
                 query = query.Where(w => w.ActionName.Contains(key) || w.Source.Contains(key) || w.After.Contains(key));
 
-            var count = query.Count();
-            var data = query.OrderByDescending(o => o.Id).Skip((pindex - 1) * rowCount).Take(rowCount);
+            //var count = query.Count();
+            //var data = query.OrderByDescending(o => o.Id).ToPageData(page, limit);
 
-            var listLog = data.ToList().Select(s =>
+            //var listLog = data.Select(s =>
+            //{
+            //    var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId);
+            //    var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId);
+            //    return new LogExtModel()
+            //    {
+            //        Id = s.Id,
+            //        AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),
+            //        ActionMethod = s.ActionMethod,
+            //        ActionName = s.ActionName,
+            //        TableName = s.MongoCollectionName,
+            //        CreateTime = s.CreateTime
+            //    };
+            //});
+            //return Ok(ApteryxResultApi.Susuccessful(new PageList<LogExtModel>(count, listLog)));
+
+            var data = query.OrderByDescending(o => o.Id).ToPageList(s =>
             {
                 var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId);
                 var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId);
@@ -82,9 +100,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                     TableName = s.MongoCollectionName,
                     CreateTime = s.CreateTime
                 };
-            });
-
-            return Ok(ApteryxResultApi.Susuccessful(new PageList<LogExtModel>(count, listLog)));
+            }, page, limit);
+            return Ok(ApteryxResultApi.Susuccessful(data));
         }
     }
 }

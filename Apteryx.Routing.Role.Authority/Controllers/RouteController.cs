@@ -64,6 +64,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("B", "编辑")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.路由无权修改, null, typeof(ApteryxResult))]
         public async Task<IActionResult> Put([FromBody] EditRouteModel model)
         {
             var routeId = model.Id;
@@ -163,11 +164,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!path.IsNullOrWhiteSpace())
                 query = query.Where(w => w.Path.Contains(path));
 
-            var totalCount = query.Count();
+            var data = query.OrderByDescending(o => o.Id).ToPageList(model.Page, model.Limit);
 
-            var data = query.OrderByDescending(o => o.Id).Skip((model.Page - 1) * model.Limit).Take(model.Limit);
-
-            return Ok(ApteryxResultApi.Susuccessful(new PageList<Route>(totalCount, data)));
+            return Ok(ApteryxResultApi.Susuccessful(data));
         }
 
 
