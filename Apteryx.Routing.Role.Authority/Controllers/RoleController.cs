@@ -200,7 +200,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!string.IsNullOrEmpty(key))
                 query = query.Where(w => w.Name.Contains(key) || w.Description.Contains(key));
 
-            var data = query.OrderByDescending(d => d.Id).ToPageList(page, limit);
+            var data = await query.OrderByDescending(d => d.Id).ToPageListAsync(page, limit);
             return Ok(ApteryxResultApi.Susuccessful(data));
         }
 

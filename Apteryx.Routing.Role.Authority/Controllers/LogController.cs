@@ -68,30 +68,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!key.IsNullOrWhiteSpace())
                 query = query.Where(w => w.ActionName.Contains(key) || w.Source.Contains(key) || w.After.Contains(key));
 
-            //var count = query.Count();
-            //var data = query.OrderByDescending(o => o.Id).ToPageData(page, limit);
-
-            //var listLog = data.Select(s =>
-            //{
-            //    var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId);
-            //    var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId);
-            //    return new LogExtModel()
-            //    {
-            //        Id = s.Id,
-            //        AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),
-            //        ActionMethod = s.ActionMethod,
-            //        ActionName = s.ActionName,
-            //        TableName = s.MongoCollectionName,
-            //        CreateTime = s.CreateTime
-            //    };
-            //});
-            //return Ok(ApteryxResultApi.Susuccessful(new PageList<LogExtModel>(count, listLog)));
-
-            var data = query.OrderByDescending(o => o.Id).ToPageList(s =>
+            var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(s =>
             {
-                var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId);
-                var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId);
-                return new LogExtModel()
+                var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId); var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId); return new LogExtModel()
                 {
                     Id = s.Id,
                     AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),

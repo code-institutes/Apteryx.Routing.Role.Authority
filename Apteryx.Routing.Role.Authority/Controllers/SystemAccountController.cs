@@ -214,7 +214,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!model.RoleId.IsNullOrWhiteSpace())
                 query = query.Where(x => x.RoleId == model.RoleId);            
 
-            var data = query.OrderByDescending(o=>o.Id).ToPageList(model.Page, model.Limit);
+            var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);
 
             return Ok(ApteryxResultApi.Susuccessful(data));
         }
