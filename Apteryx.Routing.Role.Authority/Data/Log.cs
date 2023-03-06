@@ -4,47 +4,128 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Apteryx.Routing.Role.Authority
 {
-    public sealed class Log : BaseMongoEntity
+    /// <summary>
+    /// 操作日志
+    /// </summary>
+    public class Log : BaseMongoEntity
     {
-        public Log(string systemAccountId, string mongoCollectionName, ActionMethods actionMethod, string actionName, string? source = null, string? after = null, string? groupId = null)
-        {
-            this.SystemAccountId = systemAccountId;
-            this.MongoCollectionName = mongoCollectionName;
-            this.ActionMethod = actionMethod;
-            this.ActionName = actionName;
-            this.Source = source;
-            this.After = after;
-            this.GroupId = groupId;
-        }
-        /// <summary>
-        /// 事件组ID
-        /// </summary>
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string? GroupId { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        [BsonRepresentation(BsonType.ObjectId)]
+        /// <param name="traceIdentifier"></param>
+        /// <param name="actionDescriptorId"></param>
+        /// <param name="groupName"></param>
+        /// <param name="controllerFullName"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="actionName"></param>
+        /// <param name="actionDescription"></param>
+        /// <param name="actionMethod"></param>
+        /// <param name="template"></param>
+        /// <param name="systemAccountId"></param>
+        public Log(
+            string traceIdentifier,
+            string actionDescriptorId,
+            string groupName,
+            string controllerFullName,
+            string controllerName,
+            string actionName,
+            string? actionDescription,
+            string actionMethod,
+            string template) =>
+            (TraceIdentifier, ActionDescriptorId, GroupName, ControllerFullName, ControllerName, ActionName, ActionDescription, ActionMethod, Template) =
+            (traceIdentifier, actionDescriptorId, groupName, controllerFullName, controllerName, actionName, actionDescription, actionMethod, template);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? GroupId { get; set; }
+        /// <summary>
+        /// 跟踪标识
+        /// </summary>
+        public string TraceIdentifier { get; set; }
+        /// <summary>
+        /// 动作ID
+        /// </summary>
+        public string ActionDescriptorId { get; set; }
+        /// <summary>
+        /// 组名
+        /// </summary>
+        public string GroupName { get; set; }
+        /// <summary>
+        /// 控制器全名
+        /// </summary>
+        public string ControllerFullName { get; set; }
+        /// <summary>
+        /// 控制器名称
+        /// </summary>
+        public string ControllerName { get; set; }
+        /// <summary>
+        /// 操作名
+        /// </summary>
+        public string ActionName { get; set; }
+        /// <summary>
+        /// 操作摘要
+        /// </summary>
+        public string? ActionDescription { get; set; }
+        /// <summary>
+        /// 方法协议
+        /// </summary>
+        public string ActionMethod { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string SystemAccountId { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string MongoCollectionName { get; set; }
-        /// <summary>
-        /// 原
-        /// </summary>
-        public string? Source { get; set; }
-        /// <summary>
-        /// 之后
-        /// </summary>
-        public string? After { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public ActionMethods ActionMethod { get; set; }
+        public string Template { get; set; }
+    }
+
+    /// <summary>
+    /// 日志实体模型
+    /// </summary>
+    public class Log<T> : Log
+    {
         /// <summary>
         /// 
         /// </summary>
-        public string ActionName { get; set; }
+        /// <param name="traceIdentifier"></param>
+        /// <param name="actionDescriptorId"></param>
+        /// <param name="groupName"></param>
+        /// <param name="controllerFullName"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="actionName"></param>
+        /// <param name="actionDescription"></param>
+        /// <param name="actionMethod"></param>
+        /// <param name="template"></param>
+        /// <param name="systemAccountId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="dataOld"></param>
+        /// <param name="dataNew"></param>
+        public Log(
+            string traceIdentifier,
+            string actionDescriptorId,
+            string groupName,
+            string controllerFullName,
+            string controllerName,
+            string actionName,
+            string? actionDescription,
+            string actionMethod,
+            string template,
+            string systemAccountId,
+            string? groupId,
+            T? dataOld,
+            T? dataNew) : base(traceIdentifier, actionDescriptorId, groupName, controllerFullName, controllerName, actionName, actionDescription, actionMethod, template) =>
+            (DataOld, DataNew) =
+            (dataOld, dataNew);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public T? DataOld { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public T? DataNew { get; set; }
     }
 }

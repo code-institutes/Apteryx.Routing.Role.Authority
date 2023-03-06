@@ -6,7 +6,7 @@ namespace Apteryx.Routing.Role.Authority
 {
     public class ApteryxDbContext : MongoDbProvider
     {
-        public ApteryxDbContext(IOptionsMonitor<MongoDBOptions> options ) : base(options) { }
+        public ApteryxDbContext(IOptionsMonitor<MongoDBOptions> options) : base(options) { }
         /// <summary>
         /// 系统账户信息
         /// </summary>
@@ -23,5 +23,9 @@ namespace Apteryx.Routing.Role.Authority
         /// 日志
         /// </summary>
         public IMongoCollection<Log> Logs => Database.GetCollection<Log>("ApteryxLog");
+        /// <summary>
+        /// 操作日志
+        /// </summary>
+        public IMongoCollection<CallLog> CallLogs => Database.GetCollection<CallLog>("ApteryxCallLog");
     }
 }

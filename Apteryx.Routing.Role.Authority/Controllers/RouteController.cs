@@ -14,7 +14,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [SwaggerTag("路由服务")]
     [Route("cgi-bin/apteryx/route")]
     [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = "zh1.0")]
+    [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public class RouteController : ControllerBase
     {
@@ -91,7 +91,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var result = await _db.Routes.FindOneAndReplaceOneAsync(f => f.Id == route.Id, route);
 
-            await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "Route", ActionMethods.改, "编辑路由", result.ToJson(), route.ToJson()));
+            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "Route", ActionMethods.改, "编辑路由", result.ToJson(), route.ToJson()));
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -132,7 +132,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             //删除路由
             var result = await _db.Routes.FindOneAndDeleteAsync(d => d.Id == id);
             //记录日志
-            await _db.Logs.AddAsync(new Log(sysAccountId, "Route", ActionMethods.删, "删除路由", result.ToJson()));
+            //await _db.Logs.AddAsync(new Log(sysAccountId, "Route", ActionMethods.删, "删除路由", result.ToJson()));
 
             return Ok(ApteryxResultApi.Susuccessful());
         }

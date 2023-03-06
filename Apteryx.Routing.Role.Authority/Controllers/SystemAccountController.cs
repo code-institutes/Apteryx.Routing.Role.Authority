@@ -16,7 +16,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [SwaggerTag("系统账户服务")]
     [Route("cgi-bin/apteryx/system/account")]
     [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = "zh1.0")]
+    [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     [SwaggerResponse((int)ApteryxCodes.字段验证未通过, null, typeof(ApteryxResult<IEnumerable<FieldValid>>))]
     public class SystemAccountController : Controller
@@ -162,7 +162,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .Set(s => s.Email, account.Email)
                 .Set(s => s.Password, account.Password));
 
-            await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码",result.ToJson(), account.ToJson()));
+            //await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码", result.ToJson(), account.ToJson()));
             return Ok(ApteryxResultApi.Susuccessful());
         }
 
@@ -187,7 +187,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             account.State = !account.State;
 
             var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == accountId, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
-            await _db.Logs.AddAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "启用/禁用账户", result.ToJson(), account.ToJson()));
+            //await _db.Logs.AddAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "启用/禁用账户", result.ToJson(), account.ToJson()));
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -212,9 +212,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 query = query.Where(x => x.Email.Contains(model.Email));
 
             if (!model.RoleId.IsNullOrWhiteSpace())
-                query = query.Where(x => x.RoleId == model.RoleId);            
+                query = query.Where(x => x.RoleId == model.RoleId);
 
             var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);
+
+            List<string> strList = null;
+            strList.Add("11");
 
             return Ok(ApteryxResultApi.Susuccessful(data));
         }

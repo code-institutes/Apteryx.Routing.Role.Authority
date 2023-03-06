@@ -12,7 +12,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [SwaggerTag("角色服务")]
     [Route("cgi-bin/apteryx/role")]
     [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = "zh1.0")]
+    [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public class RoleController : ControllerBase
     {
@@ -47,7 +47,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
             await _db.Roles.AddAsync(role);
-            await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.添, "添加角色", null, role.ToJson()));
+            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.添, "添加角色", null, role.ToJson()));
 
             return Ok(ApteryxResultApi.Susuccessful(role));
         }
@@ -79,7 +79,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
             var result = await _db.Roles.FindOneAndReplaceOneAsync(r => r.Id == role.Id, role);
-            await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.改, "编辑角色", result.ToJson(), role.ToJson()));
+            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.改, "编辑角色", result.ToJson(), role.ToJson()));
 
             return Ok(ApteryxResultApi.Susuccessful(role));
         }
@@ -169,13 +169,13 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var groupId = ObjectId.GenerateNewId().ToString();
             var sysAccountId = HttpContext.GetAccountId();
 
-            await _db.Logs.AddAsync(new Log(sysAccountId, "Role", ActionMethods.删, "删除角色", role.ToJson()));
+            //await _db.Logs.AddAsync(new Log(sysAccountId, "Role", ActionMethods.删, "删除角色", role.ToJson()));
             foreach (var sysAccount in _db.SystemAccounts.Where(w => w.RoleId == id))
             {
                 var sysAccountResult = _db.SystemAccounts.DeleteOne(d => d.Id == sysAccount.Id);
                 if (sysAccountResult.IsAcknowledged)
                 {
-                    await _db.Logs.AddAsync(new Log(sysAccountId, "SystemAccount", ActionMethods.删, "删除角色联动删除账户", sysAccount.ToJson()));
+                    //await _db.Logs.AddAsync(new Log(sysAccountId, "SystemAccount", ActionMethods.删, "删除角色联动删除账户", sysAccount.ToJson()));
                 }
             }
             return Ok(ApteryxResultApi.Susuccessful());

@@ -1,6 +1,8 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MongoDB.Driver;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -18,6 +20,9 @@ namespace Apteryx.Routing.Role.Authority
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
+            var traceIdentifier = context.HttpContext.TraceIdentifier;
+            _db.Database.GetCollection<Log<Log>>("ApteryxLog").DeleteOne(d => d.TraceIdentifier == traceIdentifier && d.DataNew == null && d.DataOld == null);
+
             if (context.Result == null)
             {
                 try
@@ -36,17 +41,94 @@ namespace Apteryx.Routing.Role.Authority
                     };
                     context.Exception = null;
                 }
+            }
+
+            try
+            {
+                var value = ((ObjectResult)context.Result).Value;
+                var response = new ResponseInfo()
+                {
+                    StatusCode = context.HttpContext.Response.StatusCode,
+                    Result = JsonSerializer.Serialize(value),
+                    Type = value?.GetType().ToString()
+                };
+
+                _db.CallLogs.UpdateOne(u => u.TraceIdentifier == context.HttpContext.TraceIdentifier, Builders<CallLog>.Update.Set(s => s.Response, response));
                 return;
             }
+            catch { }
             return;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var request = context.HttpContext.Request;
+            var actDesc = (Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor;
+            var httpContext = context.HttpContext;
+            var request = httpContext.Request;
+            var method = request.Method;
+
+            var requestInfo = new RequestInfo()
+            {
+                ContentType = request.ContentType,
+                ContentLength = request.ContentLength,
+                QueryString = request.QueryString.ToString(),
+                Scheme = request.Scheme,
+                Protocol = request.Protocol,
+                Method = request.Method,
+                Path = request.Path,
+                Heads = request.Headers.ToDictionary(d => d.Key, d => d.Value.ToString())
+            };
+            if (method.Contains("POST") || method.Contains("PUT") || method.Contains("PATCH") || method.Contains("DELETE"))
+                requestInfo.Bodys = context.ActionArguments.Select(s => new BodyInfo()
+                {
+                    ModelName = s.Key,
+                    Payload = JsonSerializer.Serialize(s.Value),
+                    Type = s.Value?.GetType().ToString()
+                });
+
+
+            var connInfo = new ConnectionInfo()
+            {
+                ConnectionId = httpContext.Connection.Id,
+                RemoteIpAddress = httpContext.Connection.RemoteIpAddress?.ToString(),
+                RemotePort = httpContext.Connection.RemotePort
+            };
+
+            var actDescInfo = new ActionDescriptorInfo()
+            {
+                ActionDescriptorId = actDesc.Id,
+                Template = actDesc.AttributeRouteInfo?.Template,
+                ControllerName = actDesc.ControllerName,
+                ControllerFullName = actDesc.ControllerTypeInfo.FullName,
+                ActionName = actDesc.ActionName
+            };
+            var ctrlSwaggerTagAttr = actDesc.EndpointMetadata.FirstOrDefault(f => f.GetType() == typeof(SwaggerTagAttribute));
+            if (ctrlSwaggerTagAttr != null)
+                actDescInfo.GroupName = ((SwaggerTagAttribute)ctrlSwaggerTagAttr).Description;
+            else
+                actDescInfo.GroupName = actDesc.ControllerName;
+
+            var apiRoleDescObject = actDesc.EndpointMetadata.FirstOrDefault(f => f.GetType() == typeof(ApiRoleDescriptionAttribute));
+            if (apiRoleDescObject != null)
+            {
+                var apiRoleDesc = (ApiRoleDescriptionAttribute)apiRoleDescObject;
+                actDescInfo.ActionDescription = apiRoleDesc.Name;
+            }
+
+            var callLog = new CallLog()
+            {
+                TraceIdentifier = httpContext.TraceIdentifier,
+                IdentityName = httpContext.User.Identity?.Name,
+                Request = requestInfo,
+                Connection = connInfo,
+                ActionDescriptor = actDescInfo
+            };
 
             if (!context.ModelState.IsValid)
             {
+                requestInfo.ModelState = context.ModelState.IsValid;
+                requestInfo.ModelError = context.ModelState.SelectMany(s => s.Value.Errors).Select(s => s.ErrorMessage);
+
                 var options = new JsonSerializerOptions
                 {
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
@@ -54,24 +136,34 @@ namespace Apteryx.Routing.Role.Authority
                 context.Result = new OkObjectResult(ApteryxResultApi.Fail(ApteryxCodes.字段验证未通过, JsonSerializer.Serialize(context.ModelState
                     .Where(w => w.Value.Errors.FirstOrDefault() != null)
                     .Select(s => new FieldValid { Field = s.Key, Error = s.Value.Errors.Select(s1 => s1.ErrorMessage) }), options)));
+
+                var resultValue = ((ObjectResult)context.Result).Value;
+                callLog.Response = new ResponseInfo()
+                {
+                    StatusCode = context.HttpContext.Response.StatusCode,
+                    Result = JsonSerializer.Serialize(resultValue),
+                    Type = resultValue?.GetType().ToString()
+                };
+                _db.CallLogs.Add(callLog);
                 return;
             }
+            _db.CallLogs.Add(callLog);
             return;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            if (context.HttpContext.User.Identity.IsAuthenticated)
+            if (context.HttpContext.User.Identity != null && context.HttpContext.User.Identity.IsAuthenticated)
             {
                 var method = context.HttpContext.Request.Method;
-                var template = $"/{context.ActionDescriptor.AttributeRouteInfo.Template}";
+                var template = $"/{context.ActionDescriptor.AttributeRouteInfo?.Template}";
                 var accountId = context.HttpContext.User.Identity.Name;
 
                 var systemAccount = _db.SystemAccounts.FindOne(f => f.Id == accountId);
                 if (systemAccount.IsSuper)
                     return;
 
-                if(!systemAccount.State)
+                if (!systemAccount.State)
                 {
                     context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.账户已被禁用, $"您的账户已被禁用，无法继续使用！")) { StatusCode = 200 };
                     return;

@@ -5,7 +5,7 @@
         /// <summary>
         /// 行为
         /// </summary>
-        public ActionMethods? Method { get; set; }
+        public string? Method { get; set; }
 
         /// <summary>
         /// 关键字

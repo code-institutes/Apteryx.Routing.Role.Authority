@@ -17,6 +17,9 @@ namespace Apteryx.Routing.Role.Authority
         {
             this._db = dbContext;
             this.actionDescriptor = collectionProvider;
+            _db.CallLogs.Indexes.CreateOne(new CreateIndexModel<CallLog>(Builders<CallLog>.IndexKeys.Ascending(f => f.TraceIdentifier)));
+            _db.Routes.Indexes.CreateOne(new CreateIndexModel<Route>(Builders<Route>.IndexKeys.Ascending(f => f.Path).Ascending(f => f.Method)));
+            _db.SystemAccounts.Indexes.CreateOne(new CreateIndexModel<SystemAccount>(Builders<SystemAccount>.IndexKeys.Ascending(f => f.Email).Ascending(f => f.Password)));
         }
 
         /// <summary>

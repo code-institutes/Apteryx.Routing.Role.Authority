@@ -19,7 +19,7 @@ namespace Apteryx.Routing.Role.Authority
             app.UseSwaggerUI(c =>
             {
                 c.DocumentTitle = "Apteryx RestfulAPIs Documentation";
-                c.SwaggerEndpoint($"/{routePrefix}/zh1.0/swagger.json", "Restful APIs Documentation");
+                c.SwaggerEndpoint($"/{routePrefix}/apteryx1.0/swagger.json", "Restful APIs Documentation");
                 c.RoutePrefix = routePrefix;
                 c.DefaultModelExpandDepth(2);
                 c.DefaultModelRendering(ModelRendering.Example);

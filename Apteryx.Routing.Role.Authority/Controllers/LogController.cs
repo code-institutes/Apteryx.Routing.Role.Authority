@@ -14,7 +14,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [SwaggerTag("日志服务")]
     [Route("cgi-bin/apteryx/log")]
     [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = "zh1.0")]
+    [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public class LogController : ControllerBase
     {
@@ -48,39 +48,41 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<LogExtModel>>))]
         public async Task<IActionResult> PostQuery([FromBody] QueryLogModel model)
         {
-            var page = model.Page;
-            var limit = model.Limit;
-            var method = model.Method;
-            var accountId = model.AccountId;
-            var groupId = model.GroupId;
-            var key = model.Key;
+            //var page = model.Page;
+            //var limit = model.Limit;
+            //var method = model.Method;
+            //var accountId = model.AccountId;
+            //var groupId = model.GroupId;
+            //var key = model.Key;
 
-            var query = _db.Logs.AsQueryable().AsQueryable();
-            if (method != null)
-                query = query.Where(w => w.ActionMethod == method);
+            //var query = _db.Logs.AsQueryable().AsQueryable();
+            //if (method != null)
+            //    query = query.Where(w => w.ActionMethod == method);
 
-            if (!accountId.IsNullOrWhiteSpace())
-                query = query.Where(w => w.SystemAccountId == accountId);
+            //if (!accountId.IsNullOrWhiteSpace())
+            //    query = query.Where(w => w.SystemAccountId == accountId);
 
-            if (!groupId.IsNullOrWhiteSpace())
-                query = query.Where(w => w.GroupId == groupId);
+            //if (!groupId.IsNullOrWhiteSpace())
+            //    query = query.Where(w => w.GroupId == groupId);
 
-            if (!key.IsNullOrWhiteSpace())
-                query = query.Where(w => w.ActionName.Contains(key) || w.Source.Contains(key) || w.After.Contains(key));
+            //if (!key.IsNullOrWhiteSpace())
+            //    query = query.Where(w => w.ActionName.Contains(key) || w.Source.Contains(key) || w.After.Contains(key));
 
-            var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(s =>
-            {
-                var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId); var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId); return new LogExtModel()
-                {
-                    Id = s.Id,
-                    AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),
-                    ActionMethod = s.ActionMethod,
-                    ActionName = s.ActionName,
-                    TableName = s.MongoCollectionName,
-                    CreateTime = s.CreateTime
-                };
-            }, page, limit);
-            return Ok(ApteryxResultApi.Susuccessful(data));
+            //var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(s =>
+            //{
+            //    var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId); var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId); return new LogExtModel()
+            //    {
+            //        Id = s.Id,
+            //        AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),
+            //        ActionMethod = s.ActionMethod,
+            //        ActionName = s.ActionName,
+            //        TableName = s.MongoCollectionName,
+            //        CreateTime = s.CreateTime
+            //    };
+            //}, page, limit);
+            //return Ok(ApteryxResultApi.Susuccessful(data));
+
+            return Ok(ApteryxResultApi.Susuccessful());
         }
     }
 }

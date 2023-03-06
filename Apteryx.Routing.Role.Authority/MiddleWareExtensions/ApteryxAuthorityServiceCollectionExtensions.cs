@@ -106,7 +106,7 @@ namespace Apteryx.Routing.Role.Authority
             services.AddSwaggerExamples();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("zh1.0", new OpenApiInfo
+                c.SwaggerDoc("apteryx1.0", new OpenApiInfo
                 {
                     Title = "Apteryx RestfulAPIs Documentation",
                     Version = "v1.0",
