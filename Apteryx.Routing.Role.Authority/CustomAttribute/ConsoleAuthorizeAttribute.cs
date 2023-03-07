@@ -20,9 +20,6 @@ namespace Apteryx.Routing.Role.Authority
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            var traceIdentifier = context.HttpContext.TraceIdentifier;
-            _db.Database.GetCollection<Log<Log>>("ApteryxLog").DeleteOne(d => d.TraceIdentifier == traceIdentifier && d.DataNew == null && d.DataOld == null);
-
             if (context.Result == null)
             {
                 try
@@ -45,14 +42,15 @@ namespace Apteryx.Routing.Role.Authority
 
             try
             {
-                var value = ((ObjectResult)context.Result).Value;
+                var resultValue = ((ObjectResult)context.Result).Value;
                 var response = new ResponseInfo()
                 {
                     StatusCode = context.HttpContext.Response.StatusCode,
-                    Result = JsonSerializer.Serialize(value),
-                    Type = value?.GetType().ToString()
+                    Result = resultValue.ToJson(),
+                    Type = resultValue?.GetType().ToString()
                 };
 
+                var traceIdentifier = context.HttpContext.TraceIdentifier;
                 _db.CallLogs.UpdateOne(u => u.TraceIdentifier == context.HttpContext.TraceIdentifier, Builders<CallLog>.Update.Set(s => s.Response, response));
                 return;
             }
@@ -133,15 +131,15 @@ namespace Apteryx.Routing.Role.Authority
                 {
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
                 };
-                context.Result = new OkObjectResult(ApteryxResultApi.Fail(ApteryxCodes.字段验证未通过, JsonSerializer.Serialize(context.ModelState
+                context.Result = new OkObjectResult(ApteryxResultApi.Fail(ApteryxCodes.字段验证未通过, context.ModelState
                     .Where(w => w.Value.Errors.FirstOrDefault() != null)
-                    .Select(s => new FieldValid { Field = s.Key, Error = s.Value.Errors.Select(s1 => s1.ErrorMessage) }), options)));
+                    .Select(s => new FieldValid { Field = s.Key, Error = s.Value.Errors.Select(s1 => s1.ErrorMessage) })));
 
                 var resultValue = ((ObjectResult)context.Result).Value;
                 callLog.Response = new ResponseInfo()
                 {
                     StatusCode = context.HttpContext.Response.StatusCode,
-                    Result = JsonSerializer.Serialize(resultValue),
+                    Result = resultValue.ToJson(),
                     Type = resultValue?.GetType().ToString()
                 };
                 _db.CallLogs.Add(callLog);
