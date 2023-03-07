@@ -22,12 +22,20 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     public class SystemAccountController : Controller
     {
         private readonly ApteryxDbContext _db;
+        private readonly ApteryxConfig _jwtConfig;
+        private readonly ApteryxOperationLogService _log;
 
-        public readonly ApteryxConfig _jwtConfig;
-        public SystemAccountController(ApteryxConfig jwtConfig, ApteryxDbContext mongoDbContext)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jwtConfig"></param>
+        /// <param name="mongoDbContext"></param>
+        /// <param name="logService"></param>
+        public SystemAccountController(ApteryxConfig jwtConfig, ApteryxDbContext mongoDbContext, ApteryxOperationLogService logService)
         {
-            _db = mongoDbContext;
-            _jwtConfig = jwtConfig;
+            this._db = mongoDbContext;
+            this._jwtConfig = jwtConfig;
+            this._log = logService;
         }
 
         /// <summary>
@@ -163,6 +171,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .Set(s => s.Password, account.Password));
 
             //await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码", result.ToJson(), account.ToJson()));
+            await _log.CreateAsync(result, account);
+
             return Ok(ApteryxResultApi.Susuccessful());
         }
 

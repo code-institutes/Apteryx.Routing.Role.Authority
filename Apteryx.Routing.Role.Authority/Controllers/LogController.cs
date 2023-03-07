@@ -18,11 +18,11 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public class LogController : ControllerBase
     {
-        private readonly ApteryxDbContext _db;
+        private readonly ApteryxOperationLogService _log;
 
-        public LogController(IConfiguration config, ApteryxDbContext mongoDbContext)
+        public LogController(ApteryxOperationLogService logService)
         {
-            _db = mongoDbContext;
+            this._log = logService;
         }
 
         [HttpGet("{id}")]
@@ -32,10 +32,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Log" }
         )]
         [ApiRoleDescription("A", "获取")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Log>))]
-        public async Task<IActionResult> Get([SwaggerParameter("日志ID", Required = true)] string id)
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<OperationLog<object>>))]
+        public async Task<IApteryxResult> Get([SwaggerParameter("日志ID", Required = true)] string id)
         {
-            return Ok(ApteryxResultApi.Susuccessful(await _db.Logs.FindOneAsync(f => f.Id == id)));
+            return await _log.GetAsync(id);
         }
 
         [HttpPost("query")]

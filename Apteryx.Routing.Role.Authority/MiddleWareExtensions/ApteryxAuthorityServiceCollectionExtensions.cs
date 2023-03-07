@@ -47,6 +47,8 @@ namespace Apteryx.Routing.Role.Authority
                 options.ConnectionString = config.MongoDBOptions.ConnectionString;
             });
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddAuthentication()
                 .AddJwtBearer(config.AuthenticationScheme, options =>
                 {
@@ -137,6 +139,7 @@ namespace Apteryx.Routing.Role.Authority
                 //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile));
             });
             services.AddScoped<ApteryxInitializeDataService>();
+            services.AddScoped<ApteryxOperationLogService>();
             return services;
         }
     }

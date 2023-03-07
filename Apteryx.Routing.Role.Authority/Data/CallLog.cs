@@ -1,6 +1,8 @@
-﻿namespace Apteryx.Routing.Role.Authority
+﻿using Apteryx.MongoDB.Driver.Extend;
+
+namespace Apteryx.Routing.Role.Authority
 {
-    public class CallLog
+    public class CallLog : BaseMongoEntity
     {
         public string TraceIdentifier { get; set; }
         public string? IdentityName { get; set; }
