@@ -21,12 +21,15 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         private readonly ApteryxDbContext _db;
         private readonly ApteryxInitializeDataService _initDataService;
         private readonly IActionDescriptorCollectionProvider actionDescriptor;
+        private readonly ApteryxOperationLogService _log;
 
-        public RouteController(IActionDescriptorCollectionProvider collectionProvider, ApteryxDbContext mongoDbContext, ApteryxInitializeDataService initializeDataService)
+        public RouteController(IActionDescriptorCollectionProvider collectionProvider, ApteryxDbContext mongoDbContext,
+            ApteryxInitializeDataService initializeDataService, ApteryxOperationLogService logService)
         {
             this._db = mongoDbContext;
             this.actionDescriptor = collectionProvider;
-            this._initDataService= initializeDataService;
+            this._initDataService = initializeDataService;
+            this._log = logService;
         }
 
         [HttpPost]
@@ -45,14 +48,16 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (action != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由已存在));
 
-            await _db.Routes.AddAsync(new Route()
+            var route = new Route()
             {
                 CtrlName = model.CtrlName.Trim(),
                 Description = model.Description.Trim(),
                 Method = method,
                 Path = path
-            });
-
+            };
+            await _db.Routes.AddAsync(route);
+            //记录日志
+            await _log.CreateAsync(route, null);
             return Ok(ApteryxResultApi.Susuccessful());
         }
 
@@ -75,8 +80,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (route == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由不存在));
 
-            if(route.AddType != AddTypes.人工)
-                return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由无权修改,"只能编辑手动添加的路由"));
+            if (route.AddType != AddTypes.人工)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由无权修改, "只能编辑手动添加的路由"));
 
             var check = await _db.Routes.FindOneAsync(f => f.Path == path && f.Method == method);
             if (check != null)
@@ -87,11 +92,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             route.Description = model.Description.Trim();
             route.Method = method;
             route.Path = path;
-            //route.UpdateTime = DateTime.Now;
 
             var result = await _db.Routes.FindOneAndReplaceOneAsync(f => f.Id == route.Id, route);
-
-            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "Route", ActionMethods.改, "编辑路由", result.ToJson(), route.ToJson()));
+            //记录日志
+            await _log.CreateAsync(route, result);
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -104,7 +108,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("C", "获取")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Route>))]
-        public async Task<IActionResult> Get([SwaggerParameter("路由ID", Required = true)]string id)
+        public async Task<IActionResult> Get([SwaggerParameter("路由ID", Required = true)] string id)
         {
             return Ok(ApteryxResultApi.Susuccessful(await _db.Routes.FindOneAsync(f => f.Id == id)));
         }
@@ -127,12 +131,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (route.AddType != AddTypes.人工)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由无权删除, "只能删除手动添加的路由"));
 
-            //将路由从所有角色中删除
+            //将路由从所有角色中解除关联
             await _db.Roles.UpdateManyAsync(u => u.RouteIds.Contains(id), Builders<Role>.Update.Pull(p => p.RouteIds, id));
             //删除路由
             var result = await _db.Routes.FindOneAndDeleteAsync(d => d.Id == id);
             //记录日志
-            //await _db.Logs.AddAsync(new Log(sysAccountId, "Route", ActionMethods.删, "删除路由", result.ToJson()));
+            await _log.CreateAsync(null, result);
 
             return Ok(ApteryxResultApi.Susuccessful());
         }

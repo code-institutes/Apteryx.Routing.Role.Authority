@@ -31,10 +31,12 @@ namespace Apteryx.Routing.Role.Authority
             string? actionDescription,
             string? actionMethod,
             string? template,
+            string? remarks,
+            SystemAccount? systemAccount,
             T? newData,
             T? oldData) =>
-            (TraceIdentifier, ActionDescriptorId, GroupName, ControllerFullName, ControllerName, ActionName, ActionDescription, ActionMethod, Template, NewData, OldData) =
-            (traceIdentifier, actionDescriptorId, groupName, controllerFullName, controllerName, actionName, actionDescription, actionMethod, template, newData, oldData);
+            (TraceIdentifier, ActionDescriptorId, GroupName, ControllerFullName, ControllerName, ActionName, ActionDescription, ActionMethod, Template, Remarks,SystemAccount, NewData, OldData) =
+            (traceIdentifier, actionDescriptorId, groupName, controllerFullName, controllerName, actionName, actionDescription, actionMethod, template, remarks,systemAccount, newData, oldData);
 
         /// <summary>
         /// 
@@ -80,14 +82,25 @@ namespace Apteryx.Routing.Role.Authority
         /// 
         /// </summary>
         public string? Template { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remarks { get; set; }
+        /// <summary>
+        /// 操作人员类型
+        /// </summary>
+        public SystemAccount? SystemAccount { get; set; }
+        /// <summary>
+        /// 数据类型
+        /// </summary>
         public string DataType { get; set; } = typeof(T).FullName;
         /// <summary>
         /// 
         /// </summary>
-        public T? OldData { get; set; }
+        public T? NewData { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public T? NewData { get; set; }
+        public T? OldData { get; set; }
     }
 }

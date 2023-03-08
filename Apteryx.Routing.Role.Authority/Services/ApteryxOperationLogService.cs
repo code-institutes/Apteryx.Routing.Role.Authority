@@ -1,10 +1,7 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Text.Json;
+using System.Xml.Linq;
 
 namespace Apteryx.Routing.Role.Authority
 {
@@ -17,9 +14,10 @@ namespace Apteryx.Routing.Role.Authority
             this._db = db;
             this._httpContext = httpContextAccessor;
         }
-        public async Task CreateAsync<T>(T? newData, T? oldData) where T : BaseMongoEntity
+        public async Task CreateAsync<T>(T? newData, T? oldData, string? remarks = null) where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
+            var systemAccount = await _db.SystemAccounts.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
             var callLog = await _db.CallLogs.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
@@ -35,8 +33,90 @@ namespace Apteryx.Routing.Role.Authority
                     actDesc.ActionDescription,
                     callLog.Request.Method,
                     actDesc.Template,
+                    remarks,
+                    systemAccount,
                     newData,
                     oldData));
+        }
+
+        private object? GetValue(BsonValue value)
+        {
+            switch (value.BsonType)
+            {
+                case BsonType.Null:
+                    return null;
+
+                case BsonType.String:
+                    return value.ToString();
+
+                case BsonType.Boolean:
+                    return (bool)value;
+                case BsonType.Double:
+                    return (double)value;
+
+                case BsonType.Decimal128:
+                    return (decimal)value;
+
+                case BsonType.DateTime:
+                    return (DateTime)value;
+
+                case BsonType.Int64:
+                    return (Int64)value;
+
+                case BsonType.Int32:
+                    return (Int32)value;
+
+                case BsonType.ObjectId:
+                    return value.ToString();
+
+                default: return value;
+            }
+        }
+        private (string, object?) GetNameValue(string name, BsonValue value)
+        {
+            if (name == "_id")
+            {
+                return ("Id", GetValue(value));
+            }
+            else if (value.IsBsonDocument)
+            {
+                Dictionary<string, object?> rootDic = new Dictionary<string, object?>();
+                var subDocs = value.AsBsonDocument;
+                foreach (var subDoc in subDocs)
+                {
+                    var result = GetNameValue(subDoc.Name, subDoc.Value);
+                    rootDic.Add(result.Item1, result.Item2);
+                }
+                return (name, rootDic);
+            }
+            else if (value.IsBsonArray)
+            {
+                List<object?> rootList = new List<object?>();
+                foreach (var item in value.AsBsonArray)
+                {
+                    if (item.IsBsonDocument)
+                    {
+                        var subDocs = item.AsBsonDocument;
+                        Dictionary<string, object?> subDic = new Dictionary<string, object?>();
+                        foreach (var subDoc in subDocs)
+                        {
+                            var result = GetNameValue(subDoc.Name, subDoc.Value);
+                            subDic.Add(result.Item1, result.Item2);
+                        }
+                        rootList.Add(subDic);
+                    }
+                    else
+                    {
+                        rootList.Add(GetValue(item));
+                    }
+                }
+
+                return (name, rootList);
+            }
+            else
+            {
+                return (name, GetValue(value));
+            }
         }
 
         public async Task<IApteryxResult> GetAsync(string id)
@@ -47,28 +127,68 @@ namespace Apteryx.Routing.Role.Authority
 
             var type = Type.GetType(log.DataType);
 
-            var result = new OperationLog<object>(log.TraceIdentifier, log.ActionDescriptorId, log.GroupName, log.ControllerFullName, log.ControllerName, log.ActionName, log.ActionDescription, log.ActionMethod, log.Template, null, null);
+            var result = new OperationLog<object>(log.TraceIdentifier, log.ActionDescriptorId, log.GroupName, log.ControllerFullName, log.ControllerName, log.ActionName, log.ActionDescription, log.ActionMethod, log.Template, log.Remarks, log.SystemAccount, null, null);
             if (log.NewData != null && log.OldData != null)
             {
-                var oldDic = log.OldData.ToDictionary(f => f.Name, f => f.Value?.ToString());
-                var oldJson = oldDic.ToJson().Replace("\"_id\"", "\"Id\"").Replace("\"BsonNull\"","null");
+                Dictionary<string, object?> oldDic = new Dictionary<string, object?>();
+                foreach (var item in log.OldData)
+                {
+                    if (item.Value.IsBsonNull)
+                    {
+                        oldDic.Add(item.Name, null);
+                        continue;
+                    }
+                   var nameValue =  GetNameValue(item.Name, item.Value);
+                    oldDic.Add(nameValue.Item1, nameValue.Item2);                    
+                }
+                var oldJson = oldDic.ToJson();
                 result.OldData = Newtonsoft.Json.JsonConvert.DeserializeObject(oldJson, type);
 
-                var newDic = log.NewData.ToDictionary(f => f.Name, f => f.Value?.ToString());
-                var newJson = newDic.ToJson().Replace("\"_id\"", "\"Id\"").Replace("\"BsonNull\"", "null");
+                Dictionary<string,object?> newDic = new Dictionary<string, object?>();
+                foreach(var item in log.NewData)
+                {
+                    if(item.Value.IsBsonNull)
+                    {
+                        newDic.Add(item.Name, null);
+                        continue;
+                    }
+                    var nameValue = GetNameValue(item.Name,item.Value);
+                    newDic.Add(nameValue.Item1,nameValue.Item2);
+                }
+                var newJson = newDic.ToJson();
                 result.NewData = Newtonsoft.Json.JsonConvert.DeserializeObject(newJson, type);
 
             }
             else if (log.NewData != null)
             {
-                var newDic = log.NewData.ToDictionary(f => f.Name, f => f.Value?.ToString());
-                var newJson = newDic.ToJson().Replace("\"_id\"", "\"Id\"").Replace("\"BsonNull\"", "null");
+                Dictionary<string, object?> newDic = new Dictionary<string, object?>();
+                foreach (var item in log.NewData)
+                {
+                    if (item.Value.IsBsonNull)
+                    {
+                        newDic.Add(item.Name, null);
+                        continue;
+                    }
+                    var nameValue = GetNameValue(item.Name, item.Value);
+                    newDic.Add(nameValue.Item1, nameValue.Item2);
+                }
+                var newJson = newDic.ToJson();
                 result.NewData = Newtonsoft.Json.JsonConvert.DeserializeObject(newJson, type);
             }
             else
             {
-                var oldDic = log.OldData.ToDictionary(f => f.Name, f => f.Value?.ToString());
-                var oldJson = oldDic.ToJson().Replace("\"_id\"", "\"Id\"").Replace("\"BsonNull\"", "null");
+                Dictionary<string, object?> oldDic = new Dictionary<string, object?>();
+                foreach (var item in log.OldData)
+                {
+                    if (item.Value.IsBsonNull)
+                    {
+                        oldDic.Add(item.Name, null);
+                        continue;
+                    }
+                    var nameValue = GetNameValue(item.Name, item.Value);
+                    oldDic.Add(nameValue.Item1, nameValue.Item2);
+                }
+                var oldJson = oldDic.ToJson();
                 result.OldData = Newtonsoft.Json.JsonConvert.DeserializeObject(oldJson, type);
             }
 

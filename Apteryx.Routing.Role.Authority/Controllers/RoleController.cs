@@ -17,10 +17,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     public class RoleController : ControllerBase
     {
         private readonly ApteryxDbContext _db;
+        private readonly ApteryxOperationLogService _log;
 
-        public RoleController(ApteryxDbContext mongoDbContext)
+        public RoleController(ApteryxDbContext mongoDbContext, ApteryxOperationLogService logService)
         {
-            _db = mongoDbContext;
+            this._db = mongoDbContext;
+            this._log = logService;
         }
 
         [HttpPost]
@@ -47,7 +49,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
             await _db.Roles.AddAsync(role);
-            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.添, "添加角色", null, role.ToJson()));
+            //记录日志
+            await _log.CreateAsync(role, null);
 
             return Ok(ApteryxResultApi.Susuccessful(role));
         }
@@ -67,7 +70,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{roleId}"));
 
-            if(role.AddType == AddTypes.程序 && role.Name == "超管")
+            if (role.AddType == AddTypes.程序 && role.Name == "超管")
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "禁止操作系统默认角色！"));
 
             if (_db.Roles.FindOne(a => a.Name == model.Name && a.Id != model.Id) != null)
@@ -79,7 +82,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
             var result = await _db.Roles.FindOneAndReplaceOneAsync(r => r.Id == role.Id, role);
-            //await _db.Logs.AddAsync(new Log(HttpContext.GetAccountId(), "ApteryxRole", ActionMethods.改, "编辑角色", result.ToJson(), role.ToJson()));
+            //记录日志
+            await _log.CreateAsync(role, result);
 
             return Ok(ApteryxResultApi.Susuccessful(role));
         }
@@ -167,15 +171,16 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "系统默认角色禁止删除！"));
 
             var groupId = ObjectId.GenerateNewId().ToString();
-            var sysAccountId = HttpContext.GetAccountId();
+            //记录日志
+            await _log.CreateAsync(null, role);
 
-            //await _db.Logs.AddAsync(new Log(sysAccountId, "Role", ActionMethods.删, "删除角色", role.ToJson()));
             foreach (var sysAccount in _db.SystemAccounts.Where(w => w.RoleId == id))
             {
                 var sysAccountResult = _db.SystemAccounts.DeleteOne(d => d.Id == sysAccount.Id);
                 if (sysAccountResult.IsAcknowledged)
                 {
-                    //await _db.Logs.AddAsync(new Log(sysAccountId, "SystemAccount", ActionMethods.删, "删除角色联动删除账户", sysAccount.ToJson()));
+                    //记录日志
+                    await _log.CreateAsync<BaseMongoEntity>(null, null, "删除角色联动删除账户");
                 }
             }
             return Ok(ApteryxResultApi.Susuccessful());
@@ -189,7 +194,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("F", "查询")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<Role>>))]
-        public async Task<IActionResult> PostQuery([FromBody]QueryRoleModel model)
+        public async Task<IActionResult> PostQuery([FromBody] QueryRoleModel model)
         {
             var page = model.Page;
             var limit = model.Limit;

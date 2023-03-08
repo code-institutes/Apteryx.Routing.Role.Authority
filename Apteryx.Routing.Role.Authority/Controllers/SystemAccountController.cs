@@ -36,6 +36,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             this._db = mongoDbContext;
             this._jwtConfig = jwtConfig;
             this._log = logService;
+
+
+
         }
 
         /// <summary>
@@ -55,6 +58,15 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.账号或密码错误, null, typeof(ApteryxResult))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
+
+            var newTest = new Test() { TestInfo = new Test() { TestInfo = new Test(), Tests = new List<Test>() { { new Test() }, { new Test() } } }, Tests = new List<Test>() { { new Test() { Tests = new List<Test>() { { new Test() { TestInfo = new Test() { TestInfo = new Test(), Tests = new List<Test>() { { new Test() }, { new Test() } } } } }, { new Test() } } } }, { new Test() } } };
+            var oldTest = new Test() { Tests = new List<Test>() { { new Test() }, { new Test() } } };
+
+            await _log.CreateAsync(newTest, oldTest, "复杂结构测试");
+
+
+
+
             var pwd = model.Password.ToSHA1();
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
             if (account == null)
@@ -80,6 +92,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 var aesConfig = _jwtConfig.AESConfig;
                 return Ok(ApteryxResultApi.Susuccessful(new Jwt<ResultSystemAccountRoleModel>(token, aesConfig.Key, aesConfig.IV, new ResultSystemAccountRoleModel(account, role))));
             }
+
             return Ok(ApteryxResultApi.Susuccessful(new Jwt<ResultSystemAccountRoleModel>(token, new ResultSystemAccountRoleModel(account, role))));
         }
 
@@ -111,13 +124,15 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, "该角色不存在"));
 
-            await _db.SystemAccounts.AddAsync(new SystemAccount()
+            var account = new SystemAccount()
             {
                 Name = model.Name,
                 Email = email,
                 Password = pwd.ToSHA1(),
                 RoleId = model.RoleId
-            });
+            };
+            await _db.SystemAccounts.AddAsync(account);
+            await _log.CreateAsync(account, null);
             return Ok(ApteryxResultApi.Susuccessful());
         }
 
@@ -170,7 +185,6 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .Set(s => s.Email, account.Email)
                 .Set(s => s.Password, account.Password));
 
-            //await _db.Logs.InsertOneAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "修改账户与密码", result.ToJson(), account.ToJson()));
             await _log.CreateAsync(result, account);
 
             return Ok(ApteryxResultApi.Susuccessful());
