@@ -1,7 +1,6 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
-using System.Xml.Linq;
 
 namespace Apteryx.Routing.Role.Authority
 {

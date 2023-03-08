@@ -47,7 +47,7 @@ namespace Apteryx.Routing.Role.Authority
                 {
                     StatusCode = context.HttpContext.Response.StatusCode,
                     Result = resultValue.ToJson(),
-                    Type = resultValue?.GetType().ToString()
+                    Type = resultValue?.GetType().FullName
                 };
 
                 var traceIdentifier = context.HttpContext.TraceIdentifier;
@@ -80,8 +80,8 @@ namespace Apteryx.Routing.Role.Authority
                 requestInfo.Bodys = context.ActionArguments.Select(s => new BodyInfo()
                 {
                     ModelName = s.Key,
-                    Payload = JsonSerializer.Serialize(s.Value),
-                    Type = s.Value?.GetType().ToString()
+                    Payload = s.Value.ToJson(),
+                    Type = s.Value?.GetType().FullName
                 });
 
 

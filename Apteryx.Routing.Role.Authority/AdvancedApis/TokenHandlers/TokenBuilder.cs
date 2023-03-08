@@ -7,7 +7,7 @@ namespace Apteryx.Routing.Role.Authority
     /// <summary>
     /// 
     /// </summary>
-    public sealed class JwtBuilder
+    public sealed class TokenBuilder
     {
         private SecurityKey securityKey = null;
         private string subject = "";
@@ -21,7 +21,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="securityKey"></param>
         /// <returns></returns>
-        public JwtBuilder AddSecurityKey(SecurityKey securityKey)
+        public TokenBuilder AddSecurityKey(SecurityKey securityKey)
         {
             this.securityKey = securityKey;
             return this;
@@ -31,7 +31,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="subject"></param>
         /// <returns></returns>
-        public JwtBuilder AddSubject(string subject)
+        public TokenBuilder AddSubject(string subject)
         {
             this.subject = subject;
             return this;
@@ -41,7 +41,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="issuer"></param>
         /// <returns></returns>
-        public JwtBuilder AddIssuer(string issuer)
+        public TokenBuilder AddIssuer(string issuer)
         {
             this.issuer = issuer;
             return this;
@@ -51,7 +51,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="audience"></param>
         /// <returns></returns>
-        public JwtBuilder AddAudience(string audience)
+        public TokenBuilder AddAudience(string audience)
         {
             this.audience = audience;
             return this;
@@ -62,7 +62,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <param name="type"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public JwtBuilder AddClaim(string type, string value)
+        public TokenBuilder AddClaim(string type, string value)
         {
             this.claims.Add(type, value);
             return this;
@@ -72,7 +72,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="claims"></param>
         /// <returns></returns>
-        public JwtBuilder AddClaims(Dictionary<string, string> claims)
+        public TokenBuilder AddClaims(Dictionary<string, string> claims)
         {
             this.claims.Union(claims);
             return this;
@@ -82,7 +82,7 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="expiryInMinutes"></param>
         /// <returns></returns>
-        public JwtBuilder AddExpiry(int expiryInMinutes)
+        public TokenBuilder AddExpiry(int expiryInMinutes)
         {
             this.expiryInMinutes = expiryInMinutes;
             return this;

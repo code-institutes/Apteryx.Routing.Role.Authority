@@ -54,19 +54,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "LogIn",
             Tags = new[] { "SystemAccount" }
         )]
-        [SwaggerResponse(200, null, typeof(ApteryxResult<Jwt<ResultSystemAccountRoleModel>>))]
+        [SwaggerResponse(200, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
         [SwaggerResponse((int)ApteryxCodes.账号或密码错误, null, typeof(ApteryxResult))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
-
-            var newTest = new Test() { TestInfo = new Test() { TestInfo = new Test(), Tests = new List<Test>() { { new Test() }, { new Test() } } }, Tests = new List<Test>() { { new Test() { Tests = new List<Test>() { { new Test() { TestInfo = new Test() { TestInfo = new Test(), Tests = new List<Test>() { { new Test() }, { new Test() } } } } }, { new Test() } } } }, { new Test() } } };
-            var oldTest = new Test() { Tests = new List<Test>() { { new Test() }, { new Test() } } };
-
-            await _log.CreateAsync(newTest, oldTest, "复杂结构测试");
-
-
-
-
             var pwd = model.Password.ToSHA1();
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
             if (account == null)
@@ -79,7 +70,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var role = await _db.Roles.FindOneAsync(f => f.Id == account.RoleId);
 
-            var token = new JwtBuilder()
+            var token = new TokenBuilder()
                 .AddAudience(_jwtConfig.TokenConfig.Audience)
                 .AddClaim(ClaimTypes.Name, account.Id)
                 .AddSubject(Guid.NewGuid().ToString())
@@ -90,10 +81,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (_jwtConfig.IsSecurityToken)
             {
                 var aesConfig = _jwtConfig.AESConfig;
-                return Ok(ApteryxResultApi.Susuccessful(new Jwt<ResultSystemAccountRoleModel>(token, aesConfig.Key, aesConfig.IV, new ResultSystemAccountRoleModel(account, role))));
+                return Ok(ApteryxResultApi.Susuccessful(new Token<ResultSystemAccountRoleModel>(token, aesConfig.Key, aesConfig.IV, new ResultSystemAccountRoleModel(account, role))));
             }
 
-            return Ok(ApteryxResultApi.Susuccessful(new Jwt<ResultSystemAccountRoleModel>(token, new ResultSystemAccountRoleModel(account, role))));
+            return Ok(ApteryxResultApi.Susuccessful(new Token<ResultSystemAccountRoleModel>(token, new ResultSystemAccountRoleModel(account, role))));
         }
 
         /// <summary>
