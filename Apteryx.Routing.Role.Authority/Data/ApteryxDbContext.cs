@@ -20,8 +20,12 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         public IMongoCollection<Route> Routes => Database.GetCollection<Route>("ApteryxRoute");
         /// <summary>
-        /// 操作日志
+        /// 接口调用日志
         /// </summary>
         public IMongoCollection<CallLog> CallLogs => Database.GetCollection<CallLog>("ApteryxCallLog");
+        /// <summary>
+        /// 操作日志
+        /// </summary>
+        public IMongoCollection<OperationLog> OperationLogs => Database.GetCollection<OperationLog>("ApteryxOperationLog");
     }
 }

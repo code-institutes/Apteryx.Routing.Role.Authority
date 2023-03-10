@@ -1,9 +1,4 @@
-﻿using apteryx.common.extend.Helpers;
-using Apteryx.MongoDB.Driver.Extend;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
+﻿using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Apteryx.Routing.Role.Authority.Controllers
@@ -32,7 +27,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Log" }
         )]
         [ApiRoleDescription("A", "获取")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<OperationLog<object>>))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<OperationLog>))]
         public async Task<IApteryxResult> Get([SwaggerParameter("日志ID", Required = true)] string id)
         {
             return await _log.GetAsync(id);
@@ -45,44 +40,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Log" }
         )]
         [ApiRoleDescription("B", "查询")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<LogExtModel>>))]
-        public async Task<IActionResult> PostQuery([FromBody] QueryLogModel model)
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<OperationLog>>))]
+        public async Task<IApteryxResult> PostQuery([FromBody] QueryOperationLogModel model)
         {
-            //var page = model.Page;
-            //var limit = model.Limit;
-            //var method = model.Method;
-            //var accountId = model.AccountId;
-            //var groupId = model.GroupId;
-            //var key = model.Key;
-
-            //var query = _db.Logs.AsQueryable().AsQueryable();
-            //if (method != null)
-            //    query = query.Where(w => w.ActionMethod == method);
-
-            //if (!accountId.IsNullOrWhiteSpace())
-            //    query = query.Where(w => w.SystemAccountId == accountId);
-
-            //if (!groupId.IsNullOrWhiteSpace())
-            //    query = query.Where(w => w.GroupId == groupId);
-
-            //if (!key.IsNullOrWhiteSpace())
-            //    query = query.Where(w => w.ActionName.Contains(key) || w.Source.Contains(key) || w.After.Contains(key));
-
-            //var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(s =>
-            //{
-            //    var sysAccount = _db.SystemAccounts.FindOne(f => f.Id == s.SystemAccountId); var role = _db.Roles.FindOne(f => f.Id == sysAccount.RoleId); return new LogExtModel()
-            //    {
-            //        Id = s.Id,
-            //        AccountInfo = new ResultSystemAccountRoleModel(sysAccount, role),
-            //        ActionMethod = s.ActionMethod,
-            //        ActionName = s.ActionName,
-            //        TableName = s.MongoCollectionName,
-            //        CreateTime = s.CreateTime
-            //    };
-            //}, page, limit);
-            //return Ok(ApteryxResultApi.Susuccessful(data));
-
-            return Ok(ApteryxResultApi.Susuccessful());
+            return await _log.Query(model);
         }
     }
 }

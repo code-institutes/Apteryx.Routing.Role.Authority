@@ -5,8 +5,8 @@ namespace Apteryx.Routing.Role.Authority
 {
     public sealed class Token<T>
     {
-        //public Token(JwtSecurityToken securityToken) : this(securityToken, default(T)) { }
-        //public Token(JwtSecurityToken securityToken,string aesKey,string aesIv):this(securityToken, aesKey, aesIv, default(T)) { }
+        public Token(JwtSecurityToken securityToken) : this(securityToken, default(T)) { }
+        public Token(JwtSecurityToken securityToken, string aesKey, string aesIv) : this(securityToken, aesKey, aesIv, default(T)) { }
         public Token(JwtSecurityToken securityToken, T? obj)
         {
             this.AccessToken = new JwtSecurityTokenHandler().WriteToken(securityToken);

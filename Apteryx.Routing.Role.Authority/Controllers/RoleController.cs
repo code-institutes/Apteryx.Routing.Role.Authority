@@ -50,6 +50,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
             await _db.Roles.AddAsync(role);
             //记录日志
+            //await _log.CreateAsync(role, null);
             await _log.CreateAsync(role, null);
 
             return Ok(ApteryxResultApi.Susuccessful(role));

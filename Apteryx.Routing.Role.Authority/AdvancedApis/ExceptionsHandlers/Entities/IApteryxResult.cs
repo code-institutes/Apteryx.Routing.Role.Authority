@@ -2,13 +2,13 @@
 {
     public interface IApteryxResult
     {
-        ApteryxCodes code { get; }
-        string msg { get; }
+        ApteryxCodes Code { get; }
+        string Msg { get; }
     }
 
     public interface IApteryxResult<out T> : IApteryxResult
         where T : class
     {
-        T result { get; }
+        T Result { get; }
     }
 }

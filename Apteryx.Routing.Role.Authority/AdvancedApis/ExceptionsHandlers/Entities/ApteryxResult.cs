@@ -9,8 +9,8 @@
 
         public ApteryxResult(ApteryxCodes code, string msg)
         {
-            base.code = code;
-            base.msg = msg;
+            base.Code = code;
+            base.Msg = msg;
         }
     }
 
@@ -36,9 +36,9 @@
         }
         public ApteryxResult(ApteryxCodes code, string msg, T result)
         {
-            base.code = code;
-            base.msg = msg;
-            base.result = result;
+            base.Code = code;
+            base.Msg = msg;
+            base.Result = result;
         }
     }
 }
