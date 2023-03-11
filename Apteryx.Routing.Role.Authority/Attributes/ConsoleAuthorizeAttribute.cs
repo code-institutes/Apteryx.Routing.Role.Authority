@@ -1,4 +1,5 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using apteryx.common.extend.Helpers;
+using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using MongoDB.Driver;
@@ -43,7 +44,7 @@ namespace Apteryx.Routing.Role.Authority
             try
             {
                 var resultValue = ((ObjectResult)context.Result).Value;
-                var response = new ResponseInfo()
+                var response = new Response()
                 {
                     StatusCode = context.HttpContext.Response.StatusCode,
                     Result = resultValue.ToJson(),
@@ -65,7 +66,7 @@ namespace Apteryx.Routing.Role.Authority
             var request = httpContext.Request;
             var method = request.Method;
 
-            var requestInfo = new RequestInfo()
+            var requestInfo = new Request()
             {
                 ContentType = request.ContentType,
                 ContentLength = request.ContentLength,
@@ -77,7 +78,7 @@ namespace Apteryx.Routing.Role.Authority
                 Heads = request.Headers.ToDictionary(d => d.Key, d => d.Value.ToString())
             };
             if (method.Contains("POST") || method.Contains("PUT") || method.Contains("PATCH") || method.Contains("DELETE"))
-                requestInfo.Bodys = context.ActionArguments.Select(s => new BodyInfo()
+                requestInfo.Bodys = context.ActionArguments.Select(s => new Body()
                 {
                     ModelName = s.Key,
                     Payload = s.Value.ToJson(),
@@ -85,14 +86,14 @@ namespace Apteryx.Routing.Role.Authority
                 });
 
 
-            var connInfo = new ConnectionInfo()
+            var connInfo = new Connection()
             {
                 ConnectionId = httpContext.Connection.Id,
                 RemoteIpAddress = httpContext.Connection.RemoteIpAddress?.ToString(),
                 RemotePort = httpContext.Connection.RemotePort
             };
 
-            var actDescInfo = new ActionDescriptorInfo()
+            var actDescInfo = new ActionDescriptor()
             {
                 ActionDescriptorId = actDesc.Id,
                 Template = actDesc.AttributeRouteInfo?.Template,
@@ -122,6 +123,13 @@ namespace Apteryx.Routing.Role.Authority
                 ActionDescriptor = actDescInfo
             };
 
+            if (httpContext.User.Identity != null && !httpContext.User.Identity.Name.IsNullOrWhiteSpace())
+            {
+                var accountId = httpContext.User.Identity.Name;
+                callLog.IdentityName = accountId;
+                callLog.SystemAccount = _db.SystemAccounts.FindOne(accountId);
+            }
+
             if (!context.ModelState.IsValid)
             {
                 requestInfo.ModelState = context.ModelState.IsValid;
@@ -136,7 +144,7 @@ namespace Apteryx.Routing.Role.Authority
                     .Select(s => new FieldValid { Field = s.Key, Error = s.Value.Errors.Select(s1 => s1.ErrorMessage) })));
 
                 var resultValue = ((ObjectResult)context.Result).Value;
-                callLog.Response = new ResponseInfo()
+                callLog.Response = new Response()
                 {
                     StatusCode = context.HttpContext.Response.StatusCode,
                     Result = resultValue.ToJson(),

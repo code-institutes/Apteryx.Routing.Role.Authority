@@ -38,6 +38,7 @@ namespace Apteryx.Routing.Role.Authority
                     actDesc.Template,
                     remarks,
                     systemAccount,
+                    typeof(T).FullName,
                     newData?.ToJson(),
                     oldData?.ToJson()));
         }

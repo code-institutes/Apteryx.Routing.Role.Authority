@@ -6,20 +6,21 @@ namespace Apteryx.Routing.Role.Authority
     {
         public string TraceIdentifier { get; set; }
         public string? IdentityName { get; set; }
-        public ActionDescriptorInfo ActionDescriptor { get; set; }
-        public ConnectionInfo Connection { get; set; }
-        public RequestInfo Request { get; set; }
-        public ResponseInfo? Response { get; set; }
+        public SystemAccount? SystemAccount { get; set; }
+        public ActionDescriptor ActionDescriptor { get; set; }
+        public Connection Connection { get; set; }
+        public Request Request { get; set; }
+        public Response? Response { get; set; }
     }
 
-    public sealed class ConnectionInfo
+    public sealed class Connection
     {
         public string? ConnectionId { get; set; }
         public string? RemoteIpAddress { get; set; }
         public int? RemotePort { get; set; }
     }
 
-    public sealed class ActionDescriptorInfo
+    public sealed class ActionDescriptor
     {
         public string GroupName { get; set; }
         public string? ActionDescriptorId { get; set; }
@@ -30,7 +31,7 @@ namespace Apteryx.Routing.Role.Authority
         public string? Template { get; set; }
     }
 
-    public sealed class RequestInfo
+    public sealed class Request
     {
         public string? ContentType { get; set; }
         public long? ContentLength { get; set; }
@@ -42,10 +43,10 @@ namespace Apteryx.Routing.Role.Authority
         public Dictionary<string, string>? Heads { get; set; }
         public bool ModelState { get; set; } = true;
         public IEnumerable<string>? ModelError { get; set; }
-        public IEnumerable<BodyInfo>? Bodys { get; set; }
+        public IEnumerable<Body>? Bodys { get; set; }
         public DateTime CreateTime { get; set; } = DateTime.Now;
     }
-    public sealed class BodyInfo
+    public sealed class Body
     {
         /// <summary>
         /// 模型名称
@@ -61,7 +62,7 @@ namespace Apteryx.Routing.Role.Authority
         public string? Type { get; set; }
     }
 
-    public class ResponseInfo
+    public class Response
     {
         public int StatusCode { get; set; }
         public string? Result { get; set; }
