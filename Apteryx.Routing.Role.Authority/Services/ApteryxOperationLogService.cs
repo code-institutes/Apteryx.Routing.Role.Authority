@@ -42,6 +42,31 @@ namespace Apteryx.Routing.Role.Authority
                     newData?.ToJson(),
                     oldData?.ToJson()));
         }
+        public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null)
+        {
+            var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
+            var systemAccount = await _db.SystemAccounts.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.CallLogs.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            if (callLog == null) { return; }
+
+            var actDesc = callLog.ActionDescriptor;
+
+            await _db.OperationLogs.AddAsync(clientSession, new OperationLog(
+                    callLog.TraceIdentifier,
+                    actDesc.ActionDescriptorId,
+                    actDesc.GroupName,
+                    actDesc.ControllerFullName,
+                    actDesc.ControllerName,
+                    actDesc.ActionName,
+                    actDesc.ActionDescription,
+                    callLog.Request.Method,
+                    actDesc.Template,
+                    remarks,
+                    systemAccount,
+                    typeof(T).FullName,
+                    newData?.ToJson(),
+                    oldData?.ToJson()));
+        }
 
         public async Task<IApteryxResult> GetAsync(string id)
         {
