@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -34,6 +33,8 @@ namespace Apteryx.Routing.Role.Authority
             if (config.IsSecurityToken)
                 if (config.AESConfig == null)
                     throw new Exception("当开启加密Token设置后，“AESConfig”配置不能为空！");
+            services.AddSingleton(config);
+
             services.AddControllers(option =>
             {
                 option.Filters.Add<ConsoleAuthorizeAttribute>();
@@ -41,7 +42,7 @@ namespace Apteryx.Routing.Role.Authority
             {
                 options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
             });
-            services.AddSingleton<ApteryxConfig>(config);
+
             services.AddMongoDB<ApteryxDbContext>(options =>
             {
                 options.ConnectionString = config.MongoDBOptions.ConnectionString;
@@ -83,8 +84,6 @@ namespace Apteryx.Routing.Role.Authority
                     };
                     if (config.IsSecurityToken)
                     {
-                        if (config.AESConfig == null)
-                            throw new Exception("");
                         options.SecurityTokenValidators.Clear();
                         options.SecurityTokenValidators.Add(new TokenValidator(config.AESConfig.Key, config.AESConfig.IV));
                     }
@@ -105,6 +104,7 @@ namespace Apteryx.Routing.Role.Authority
                         ClockSkew = TimeSpan.Zero
                     };
                 });
+
             services.AddSwaggerExamples();
             services.AddSwaggerGen(c =>
             {
@@ -116,8 +116,14 @@ namespace Apteryx.Routing.Role.Authority
                     {
                         Name = "Apteryx Developer",
                         Email = "wyspaces@outlook.com"
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Apache 2.0",
+                        Url = new Uri("http://www.apache.org/licenses/LICENSE-2.0.html")
                     }
                 });
+                //c.TagActionsBy(api => api.HttpMethod);
                 c.EnableAnnotations();
                 c.IgnoreObsoleteActions();
                 c.IgnoreObsoleteProperties();
@@ -135,9 +141,11 @@ namespace Apteryx.Routing.Role.Authority
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey
                 });
+
                 //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile));
             });
+
             services.AddScoped<ApteryxInitializeDataService>();
             services.AddScoped<ApteryxOperationLogService>();
             return services;

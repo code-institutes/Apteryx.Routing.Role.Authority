@@ -14,7 +14,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 {
     [Authorize(AuthenticationSchemes = "apteryx")]
     [SwaggerTag("系统账户服务")]
-    [Route("cgi-bin/apteryx/system/account")]
+    [Route("apteryx/system/account")]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]

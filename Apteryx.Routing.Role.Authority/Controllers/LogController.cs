@@ -8,7 +8,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [Authorize(AuthenticationSchemes = "apteryx")]
 #endif
     [SwaggerTag("日志服务")]
-    [Route("cgi-bin/apteryx/log")]
+    [Route("apteryx/log")]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]

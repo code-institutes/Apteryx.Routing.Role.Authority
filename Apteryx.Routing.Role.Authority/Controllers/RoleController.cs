@@ -10,7 +10,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 {
     [Authorize(AuthenticationSchemes = "apteryx")]
     [SwaggerTag("角色服务")]
-    [Route("cgi-bin/apteryx/role")]
+    [Route("apteryx/role")]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
@@ -64,6 +64,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("B", "编辑")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Role>))]
+
         public async Task<IActionResult> Put([FromBody] EditRoleModel model)
         {
             var roleId = model.Id;

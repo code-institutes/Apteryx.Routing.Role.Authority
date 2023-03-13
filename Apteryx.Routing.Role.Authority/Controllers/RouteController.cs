@@ -12,7 +12,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 {
     [Authorize(AuthenticationSchemes = "apteryx")]
     [SwaggerTag("路由服务")]
-    [Route("cgi-bin/apteryx/route")]
+    [Route("apteryx/route")]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = "apteryx1.0")]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
