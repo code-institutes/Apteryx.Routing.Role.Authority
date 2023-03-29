@@ -141,6 +141,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             return Ok(ApteryxResultApi.Susuccessful());
         }
 
+        [Obsolete("已过时")]
         [HttpPost("query")]
         [SwaggerOperation(
             Summary = "查询",
@@ -171,6 +172,19 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);
 
             return Ok(ApteryxResultApi.Susuccessful(data));
+        }
+
+        [HttpGet("all")]
+        [SwaggerOperation(
+                       Summary = "获取所有路由",
+                       OperationId = "GetAll",
+                       Tags = new[] { "Route" }
+                              )]
+        [ApiRoleDescription("F1", "获取所有路由")]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Route>>))]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(ApteryxResultApi.Susuccessful(await _db.Routes.FindAllAsync()));
         }
 
 

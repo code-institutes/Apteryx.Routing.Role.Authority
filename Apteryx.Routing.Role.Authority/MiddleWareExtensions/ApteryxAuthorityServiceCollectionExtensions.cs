@@ -125,8 +125,8 @@ namespace Apteryx.Routing.Role.Authority
                 });
                 //c.TagActionsBy(api => api.HttpMethod);
                 c.EnableAnnotations();
-                c.IgnoreObsoleteActions();
-                c.IgnoreObsoleteProperties();
+                //c.IgnoreObsoleteActions();
+                //c.IgnoreObsoleteProperties();
 
                 c.ExampleFilters();
                 c.AddEnumsWithValuesFixFilters();
