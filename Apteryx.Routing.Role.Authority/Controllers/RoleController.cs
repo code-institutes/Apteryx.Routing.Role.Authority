@@ -162,15 +162,16 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("E", "删除")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
-        public async Task<IActionResult> Delete([SwaggerParameter("角色ID", Required = true)]
-            string id)
+        public async Task<IActionResult> Delete([SwaggerParameter("角色ID", Required = true)]            string id)
         {
-            var role = await _db.Roles.FindOneAndDeleteAsync(d => d.Id == id);
+            var role = await _db.Roles.FindOneAsync(d => d.Id == id);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{id}"));
 
             if (role.AddType == AddTypes.程序)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "系统默认角色禁止删除！"));
+
+            await _db.Roles.DeleteOneAsync(d => d.Id == id);
 
             var groupId = ObjectId.GenerateNewId().ToString();
             //记录日志

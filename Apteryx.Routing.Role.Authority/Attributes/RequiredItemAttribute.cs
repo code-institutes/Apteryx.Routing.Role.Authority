@@ -10,13 +10,12 @@ namespace Apteryx.Routing.Role.Authority
     public class RequiredItemAttribute : ValidationAttribute
     {
         protected readonly List<ValidationResult> validationResults = new List<ValidationResult>();
-        protected string ErrorMessage { get; set; }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var list = value as IEnumerable;
             if (list == null)
-                return new ValidationResult($"数组属性 {validationContext.DisplayName} 不能为空");
+                return new ValidationResult(ErrorMessage ?? $"数组属性 {validationContext.DisplayName} 不能为空");
 
             var isValid = true;
             int count = 0;
@@ -29,7 +28,7 @@ namespace Apteryx.Routing.Role.Authority
             }
 
             if (count == 0)
-                return new ValidationResult($"数组属性 {validationContext.DisplayName} 不能为空");
+                return new ValidationResult(ErrorMessage ?? $"数组属性 {validationContext.DisplayName} 不能为空");
             return ValidationResult.Success;
         }
     }
