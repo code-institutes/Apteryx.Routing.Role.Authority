@@ -43,7 +43,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             {
                 Id = ObjectId.GenerateNewId().ToString(),
                 Name = model.Name.Trim(),
-                Description = model.Description.Trim(),
+                Description = model.Description?.Trim(),
                 RouteIds = _db.Routes.AsQueryable().Where(w => w.IsMustHave == true).Select(s => s.Id).ToList()
             };
 
