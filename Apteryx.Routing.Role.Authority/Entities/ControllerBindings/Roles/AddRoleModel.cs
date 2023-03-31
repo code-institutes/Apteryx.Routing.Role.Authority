@@ -10,7 +10,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 角色名
         /// </summary>
-        [Required(ErrorMessage ="“{0}”必填")]
+        [Required(ErrorMessage ="“角色名”必填")]
         public string? Name { get; set; }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 路由ID
         /// </summary>
-        [RequiredItem]
+        [RequiredItem(ErrorMessage = "至少选中一个权限")]
         public IEnumerable<string>? RouteIds { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 角色ID
         /// </summary>
-        [Required(ErrorMessage ="“{0}”必填")]
+        [Required(ErrorMessage ="“角色ID”必填")]
         public string? Id { get; set; }
     }
 }

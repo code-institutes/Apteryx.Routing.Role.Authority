@@ -10,6 +10,7 @@ namespace Apteryx.Routing.Role.Authority
     public class RequiredItemAttribute : ValidationAttribute
     {
         protected readonly List<ValidationResult> validationResults = new List<ValidationResult>();
+        protected string ErrorMessage { get; set; }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
