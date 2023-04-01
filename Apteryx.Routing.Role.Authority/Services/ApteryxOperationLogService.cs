@@ -1,8 +1,6 @@
 ﻿using apteryx.common.extend.Helpers;
 using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Apteryx.Routing.Role.Authority

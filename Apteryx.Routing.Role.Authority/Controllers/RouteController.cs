@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Swashbuckle.AspNetCore.Annotations;
 using MongoDB.Driver;
-using MongoDB.Bson;
 using apteryx.common.extend.Helpers;
 
 namespace Apteryx.Routing.Role.Authority.Controllers

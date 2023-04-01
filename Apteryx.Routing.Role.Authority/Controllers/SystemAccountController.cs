@@ -2,9 +2,7 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
@@ -36,9 +34,6 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             this._db = mongoDbContext;
             this._jwtConfig = jwtConfig;
             this._log = logService;
-
-
-
         }
 
         /// <summary>
@@ -176,7 +171,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .Set(s => s.Email, account.Email)
                 .Set(s => s.Password, account.Password));
 
-            await _log.CreateAsync(result, account);
+            await _log.CreateAsync(account,result);
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -202,7 +197,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             account.State = !account.State;
 
             var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == accountId, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
-            //await _db.Logs.AddAsync(new Log(accountId, "SystemAccount", ActionMethods.改, "启用/禁用账户", result.ToJson(), account.ToJson()));
+            await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -230,9 +225,6 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 query = query.Where(x => x.RoleId == model.RoleId);
 
             var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);
-
-            List<string> strList = null;
-            strList.Add("11");
 
             return Ok(ApteryxResultApi.Susuccessful(data));
         }

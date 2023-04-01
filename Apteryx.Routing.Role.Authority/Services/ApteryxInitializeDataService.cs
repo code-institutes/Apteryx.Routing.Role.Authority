@@ -49,16 +49,16 @@ namespace Apteryx.Routing.Role.Authority
             var act = _db.SystemAccounts.FindAll();
             if (!act.Any())
             {
-                var role = _db.Roles.FindOne(f => f.Name == "超管" && f.AddType == AddTypes.程序);
+                var role = _db.Roles.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序);
                 if (role == null)
                 {
 
 
                     role = new Role()
                     {
-                        Name = "超管",
+                        Name = "管理员",
                         AddType = AddTypes.程序,
-                        Description = "系统默认超级管理员",
+                        Description = "系统默认管理员（非超管）",
                         Id = ObjectId.GenerateNewId().ToString(),
                         RouteIds = routeIds
                     };
@@ -75,7 +75,7 @@ namespace Apteryx.Routing.Role.Authority
             }
             else
             {
-                var role = _db.Roles.FindOne(f => f.Name == "超管" && f.AddType == AddTypes.程序);
+                var role = _db.Roles.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序);
                 _db.Roles.UpdateOne(u => u.Id == role.Id, Builders<Role>.Update.Set(s => s.RouteIds, routeIds));
             }
         }

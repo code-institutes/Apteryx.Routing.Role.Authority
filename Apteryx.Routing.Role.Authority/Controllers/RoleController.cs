@@ -72,7 +72,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{roleId}"));
 
-            if (role.AddType == AddTypes.程序 && role.Name == "超管")
+            if (role.AddType == AddTypes.程序 && role.Name == "管理员")
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "禁止操作系统默认角色！"));
 
             if (_db.Roles.FindOne(a => a.Name == model.Name && a.Id != model.Id) != null)
@@ -162,7 +162,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("E", "删除")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
-        public async Task<IActionResult> Delete([SwaggerParameter("角色ID", Required = true)]            string id)
+        public async Task<IActionResult> Delete([SwaggerParameter("角色ID", Required = true)] string id)
         {
             var role = await _db.Roles.FindOneAsync(d => d.Id == id);
             if (role == null)
@@ -210,6 +210,18 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var data = await query.OrderByDescending(d => d.Id).ToPageListAsync(page, limit);
             return Ok(ApteryxResultApi.Susuccessful(data));
+        }
+
+        [HttpGet("all")]
+        [SwaggerOperation(
+            Summary = "获取所有角色",
+            OperationId = "All",
+            Tags = new[] { "Role" })]
+        [ApiRoleDescription("G", "获取所有")]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Role>>))]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(ApteryxResultApi.Susuccessful(await _db.Roles.FindAllAsync()));
         }
 
         //[HttpGet("report/usage/{roleId}")]
