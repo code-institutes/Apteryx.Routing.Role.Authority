@@ -3,6 +3,7 @@ using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
@@ -49,8 +50,8 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "LogIn",
             Tags = new[] { "SystemAccount" }
         )]
-        [SwaggerResponse(200, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
         [SwaggerResponse((int)ApteryxCodes.账号或密码错误, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
             var pwd = model.Password.ToSHA1();
@@ -95,6 +96,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         )]
         [ApiRoleDescription("A", "添加")]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Post([FromBody] AddSystemAccountModel model)
         {
             var email = model.Email?.Trim();
@@ -112,6 +114,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var account = new SystemAccount()
             {
+                Id = ObjectId.GenerateNewId().ToString(),
                 Name = model.Name,
                 Email = email,
                 Password = pwd.ToSHA1(),
@@ -119,7 +122,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             };
             await _db.SystemAccounts.AddAsync(account);
             await _log.CreateAsync(account, null);
-            return Ok(ApteryxResultApi.Susuccessful());
+            return Ok(ApteryxResultApi.Susuccessful(account));
         }
 
         [HttpGet("{id}")]
@@ -129,15 +132,14 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "SystemAccount" }
         )]
         [ApiRoleDescription("B", "获取")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<ResultSystemAccountRoleModel>))]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Get([SwaggerParameter("账户ID", Required = false)] string id)
         {
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
-            var role = _db.Roles.FindOne(f => f.Id == account.RoleId);
-            return Ok(ApteryxResultApi.Susuccessful(new ResultSystemAccountRoleModel(account, role)));
+            return Ok(ApteryxResultApi.Susuccessful(account));
         }
 
         [HttpPut]
@@ -146,7 +148,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "Put",
             Tags = new[] { "SystemAccount" }
         )]
-        [ApiRoleDescription("C1", "编辑")]
+        [ApiRoleDescription("C", "编辑")]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Put([FromBody] EditSystemAccountModel model)
@@ -184,11 +186,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [HttpPut("password")]
         [SwaggerOperation(
             Summary = "修改账户与密码",
-            OperationId = "Put",
+            OperationId = "PutPwd",
             Tags = new[] { "SystemAccount" }
         )]
-        [ApiRoleDescription("C", "修改账户与密码", isMustHave: true)]
+        [ApiRoleDescription("D", "修改账户与密码", isMustHave: true)]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> PutPwd([FromBody] EditPwdSystemAccountModel model)
         {
             var accountId = HttpContext.GetAccountId();
@@ -214,7 +217,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             await _log.CreateAsync(account, result);
 
-            return Ok(ApteryxResultApi.Susuccessful());
+            return Ok(ApteryxResultApi.Susuccessful(account));
         }
 
         [HttpPut("state")]
@@ -223,6 +226,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "State",
             Tags = new[] { "SystemAccount" }
         )]
+        [ApiRoleDescription("E", "查询")]
+        [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> PutState([FromBody] EditStateSystemAccountModel model)
         {
             var id = model.Id;
@@ -240,7 +246,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == accountId, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
             await _log.CreateAsync(account, result);
 
-            return Ok(ApteryxResultApi.Susuccessful());
+            return Ok(ApteryxResultApi.Susuccessful(account));
         }
 
         [HttpPost("query")]
@@ -249,9 +255,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "Query",
             Tags = new[] { "SystemAccount" }
         )]
-        [ApiRoleDescription("D", "查询")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<SystemAccount>>))]
+        [ApiRoleDescription("F", "查询")]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<SystemAccount>>))]
         public async Task<IActionResult> PostQuery([FromBody] QuerySystemAccountModel model)
         {
             var pindex = model.Page;

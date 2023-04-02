@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Swashbuckle.AspNetCore.Annotations;
 using MongoDB.Driver;
 using apteryx.common.extend.Helpers;
+using MongoDB.Bson;
 
 namespace Apteryx.Routing.Role.Authority.Controllers
 {
@@ -14,6 +15,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
     [Route("apteryx/route")]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = "apteryx1.0")]
+    [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public class RouteController : ControllerBase
     {
@@ -38,7 +40,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Route" }
         )]
         [ApiRoleDescription("A", "添加")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Route>))]
         public async Task<IActionResult> Post([FromBody] AddRouteModel model)
         {
             var path = model.Path.Trim();
@@ -49,6 +51,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var route = new Route()
             {
+                Id = ObjectId.GenerateNewId().ToString(),
                 CtrlName = model.CtrlName.Trim(),
                 Description = model.Description.Trim(),
                 Method = method,
@@ -57,7 +60,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             await _db.Routes.AddAsync(route);
             //记录日志
             await _log.CreateAsync(route, null);
-            return Ok(ApteryxResultApi.Susuccessful());
+            return Ok(ApteryxResultApi.Susuccessful(route));
         }
 
         [HttpPut]
@@ -67,7 +70,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Route" }
         )]
         [ApiRoleDescription("B", "编辑")]
-        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Route>))]
         [SwaggerResponse((int)ApteryxCodes.路由无权修改, null, typeof(ApteryxResult))]
         public async Task<IActionResult> Put([FromBody] EditRouteModel model)
         {
@@ -96,7 +99,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             //记录日志
             await _log.CreateAsync(route, result);
 
-            return Ok(ApteryxResultApi.Susuccessful());
+            return Ok(ApteryxResultApi.Susuccessful(route));
         }
 
         [HttpGet("{id}")]
@@ -139,8 +142,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
-
-        [Obsolete("已过时")]
+        
         [HttpPost("query")]
         [SwaggerOperation(
             Summary = "查询",
@@ -179,7 +181,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                        OperationId = "GetAll",
                        Tags = new[] { "Route" }
                               )]
-        [ApiRoleDescription("F1", "获取所有路由")]
+        [ApiRoleDescription("F", "获取所有路由")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Route>>))]
         public async Task<IActionResult> GetAll()
         {
@@ -196,7 +198,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "Refresh",
             Tags = new[] { "Route" }
         )]
-        [ApiRoleDescription("F", "刷新")]
+        [ApiRoleDescription("G", "刷新")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<ResultGroupRouteModel>>))]
         public async Task<ActionResult<ApteryxResult<List<Route>>>> GetRefresh()
         {
