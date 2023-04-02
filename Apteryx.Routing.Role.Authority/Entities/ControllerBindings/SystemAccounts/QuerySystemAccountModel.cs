@@ -6,6 +6,10 @@
     public sealed class QuerySystemAccountModel : BaseQueryModel
     {
         /// <summary>
+        /// 姓名
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
         /// 电子邮件
         /// </summary>
         public string? Email { get; set; }

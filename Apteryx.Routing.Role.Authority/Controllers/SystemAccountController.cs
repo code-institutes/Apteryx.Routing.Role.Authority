@@ -142,6 +142,47 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
         [HttpPut]
         [SwaggerOperation(
+            Summary = "修改账户信息",
+            OperationId = "Put",
+            Tags = new[] { "SystemAccount" }
+        )]
+        [ApiRoleDescription("C1", "编辑")]
+        [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
+        public async Task<IActionResult> Put([FromBody] EditSystemAccountModel model)
+        {
+            var accountId = HttpContext.GetAccountId();
+            var email = model.Email.Trim();
+            var pwd = model.Password.Trim();
+
+            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id != accountId && f.Email == email);
+            if(account != null)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, $"已存在邮箱为：“{email}”的账户"));
+
+            account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
+            if (account == null)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
+
+            if (account.IsSuper == true && account.Id != accountId)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
+
+            var role = await _db.Roles.FindOneAsync(f => f.Id == model.RoleId);
+            if (role == null)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{model.RoleId}”"));
+            
+            account.Name = model.Name.Trim();
+            account.RoleId = model.RoleId;
+            account.Email = email;
+            account.Password= pwd.ToSHA1();
+
+            var result = await _db.SystemAccounts.FindOneAndReplaceOneAsync(f => f.Id == accountId,account);
+            await _log.CreateAsync(account, result);
+
+            return Ok(ApteryxResultApi.Susuccessful(account));
+        }
+
+        [HttpPut("password")]
+        [SwaggerOperation(
             Summary = "修改账户与密码",
             OperationId = "Put",
             Tags = new[] { "SystemAccount" }
@@ -171,7 +212,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .Set(s => s.Email, account.Email)
                 .Set(s => s.Password, account.Password));
 
-            await _log.CreateAsync(account,result);
+            await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful());
         }
@@ -217,6 +258,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var rowCount = model.Limit;
 
             var query = _db.SystemAccounts.AsQueryable().AsQueryable();
+
+            if (!model.Name.IsNullOrWhiteSpace())
+                query = query.Where(x => x.Name.Contains(model.Name));
 
             if (!model.Email.IsNullOrWhiteSpace())
                 query = query.Where(x => x.Email.Contains(model.Email));

@@ -5,7 +5,7 @@ namespace Apteryx.Routing.Role.Authority
     /// <summary>
     /// 添加系统账户模型
     /// </summary>
-    public sealed class AddSystemAccountModel
+    public class AddSystemAccountModel
     {
         /// <summary>
         /// 姓名
