@@ -160,7 +160,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var roleId = model.RoleId?.Trim();
 
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Id != accountId && f.Email == email);
-            if(account != null)
+            if (account != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, $"已存在邮箱为：“{email}”的账户"));
 
             account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
@@ -173,13 +173,13 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var role = await _db.Roles.FindOneAsync(f => f.Id == roleId);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{roleId}”"));
-            
+
             account.Name = name;
             account.RoleId = roleId;
             account.Email = email;
-            account.Password= pwd.ToSHA1();
+            account.Password = pwd.ToSHA1();
 
-            var result = await _db.SystemAccounts.FindOneAndReplaceOneAsync(f => f.Id == accountId,account);
+            var result = await _db.SystemAccounts.FindOneAndReplaceOneAsync(f => f.Id == accountId, account);
             await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful(account));
@@ -251,13 +251,37 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             return Ok(ApteryxResultApi.Susuccessful(account));
         }
 
+        [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "删除",
+            OperationId = "Delete",
+            Tags = new[] { "SystemAccount" }
+        )]
+        [ApiRoleDescription("F", "删除")]
+        [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
+            if (account == null)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
+
+            if (account.IsSuper == true)
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
+
+            await _db.SystemAccounts.DeleteOneAsync(f => f.Id == id);
+            await _log.CreateAsync(null, account);
+
+            return Ok(ApteryxResultApi.Susuccessful());
+        }
+
         [HttpPost("query")]
         [SwaggerOperation(
             Summary = "查询",
             OperationId = "Query",
             Tags = new[] { "SystemAccount" }
         )]
-        [ApiRoleDescription("F", "查询")]
+        [ApiRoleDescription("G", "查询")]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<SystemAccount>>))]
         public async Task<IActionResult> PostQuery([FromBody] QuerySystemAccountModel model)

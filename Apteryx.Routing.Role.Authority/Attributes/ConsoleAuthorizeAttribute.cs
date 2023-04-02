@@ -166,6 +166,11 @@ namespace Apteryx.Routing.Role.Authority
                 var accountId = context.HttpContext.User.Identity.Name;
 
                 var systemAccount = _db.SystemAccounts.FindOne(f => f.Id == accountId);
+                if (systemAccount == null)
+                {
+                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.Unauthorized, $"您的账户已被删除，无法继续操作！")) { StatusCode = 200 };
+                    return;
+                }
                 if (systemAccount.IsSuper)
                     return;
 
@@ -186,13 +191,13 @@ namespace Apteryx.Routing.Role.Authority
                     else
                     {
                         var role = _db.Roles.FindOne(systemAccount.RoleId);
-                        context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.权限不足, $"角色：“{role.Name}”无权访问当前路由！")) { StatusCode = 200 };
+                        context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.权限不足, $"角色“{role.Name}”无权限访问“{route.CtrlName}”的“{route.Name}”接口！")) { StatusCode = 200 };
                         return;
                     }
                 }
                 else
                 {
-                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.路由不存在, $"路由：“{template}”在数据库中未找到！")) { StatusCode = 200 };
+                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.路由不存在, $"路由“{template}”在数据库中未找到！")) { StatusCode = 200 };
                 }
             }
             return;
