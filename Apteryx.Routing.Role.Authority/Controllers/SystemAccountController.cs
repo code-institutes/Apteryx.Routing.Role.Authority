@@ -153,9 +153,11 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Put([FromBody] EditSystemAccountModel model)
         {
-            var accountId = HttpContext.GetAccountId();
-            var email = model.Email.Trim();
-            var pwd = model.Password.Trim();
+            var accountId = model.Id?.Trim();
+            var name = model.Name?.Trim();
+            var email = model.Email?.Trim();
+            var pwd = model.Password?.Trim();
+            var roleId = model.RoleId?.Trim();
 
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Id != accountId && f.Email == email);
             if(account != null)
@@ -165,15 +167,15 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
-            if (account.IsSuper == true && account.Id != accountId)
+            if (account.IsSuper == true && account.Id != HttpContext.GetAccountId())
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
 
-            var role = await _db.Roles.FindOneAsync(f => f.Id == model.RoleId);
+            var role = await _db.Roles.FindOneAsync(f => f.Id == roleId);
             if (role == null)
-                return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{model.RoleId}”"));
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{roleId}”"));
             
-            account.Name = model.Name.Trim();
-            account.RoleId = model.RoleId;
+            account.Name = name;
+            account.RoleId = roleId;
             account.Email = email;
             account.Password= pwd.ToSHA1();
 
@@ -226,7 +228,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             OperationId = "State",
             Tags = new[] { "SystemAccount" }
         )]
-        [ApiRoleDescription("E", "查询")]
+        [ApiRoleDescription("E", "修改状态")]
         [SwaggerResponse((int)ApteryxCodes.Unauthorized, null, typeof(ApteryxResult))]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> PutState([FromBody] EditStateSystemAccountModel model)
