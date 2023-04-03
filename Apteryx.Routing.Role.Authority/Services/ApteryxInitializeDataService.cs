@@ -67,6 +67,7 @@ namespace Apteryx.Routing.Role.Authority
 
                 _db.SystemAccounts.Add(new SystemAccount()
                 {
+                    Name="super admin",
                     Email = "wyspaces@outlook.com",
                     Password = "admin1234".ToSHA1(),
                     IsSuper = true,

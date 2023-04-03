@@ -234,7 +234,6 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         public async Task<IActionResult> PutState([FromBody] EditStateSystemAccountModel model)
         {
             var id = model.Id;
-            var accountId = HttpContext.GetAccountId();
 
             var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
             if (account == null)
@@ -245,7 +244,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             account.State = !account.State;
 
-            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == accountId, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
+            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == id, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
             await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful(account));
