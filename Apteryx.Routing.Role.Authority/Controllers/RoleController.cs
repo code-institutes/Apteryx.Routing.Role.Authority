@@ -94,10 +94,10 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerOperation(
             Summary = "获取账户所有权限",
             OperationId = "Auth",
-            Description = "获取当前登录账户的权限",
+            Description = "获取当前登录账户的权限(包含所有接口)",
             Tags = new[] { "Role" }
         )]
-        [ApiRoleDescription("C", "获取拥有权限", isMustHave: true)]
+        [ApiRoleDescription("C", "获取拥有/非拥有的权限", isMustHave: true)]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<ResultOwnRouteModel>))]
         public async Task<IActionResult> GetAuth()
         {
@@ -118,6 +118,25 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                     })
                 })
             };
+            return Ok(ApteryxResultApi.Susuccessful(data));
+        }
+
+        [HttpGet("auth")]
+        [SwaggerOperation(
+            Summary = "获取账户所有权限",
+            OperationId = "OnlyAuth",
+            Description = "获取当前登录账户的权限",
+            Tags = new[] { "Role" }
+        )]
+        [ApiRoleDescription("C1", "获取拥有权限", isMustHave: true)]
+        [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Route>>))]
+        public async Task<IActionResult> GetOnlyAuth()
+        {
+            var accountId = HttpContext.GetAccountId();
+            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
+            var routes = _db.Routes.FindAll();
+            var role = await _db.Roles.FindOneAsync(account.RoleId);
+            var data = role.RouteIds.Select(s => routes.FirstOrDefault(f => f.Id == s));
             return Ok(ApteryxResultApi.Susuccessful(data));
         }
 
