@@ -67,7 +67,7 @@ namespace Apteryx.Routing.Role.Authority
 
                 _db.SystemAccounts.Add(new SystemAccount()
                 {
-                    Name="super admin",
+                    Name = "super admin",
                     Email = "wyspaces@outlook.com",
                     Password = "admin1234".ToSHA1(),
                     IsSuper = true,
@@ -76,7 +76,7 @@ namespace Apteryx.Routing.Role.Authority
             }
             else
             {
-                var role = _db.Roles.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序);
+                var role = _db.Roles.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序 || f.Name == "超管" && f.AddType == AddTypes.程序);
                 _db.Roles.UpdateOne(u => u.Id == role.Id, Builders<Role>.Update.Set(s => s.RouteIds, routeIds));
             }
         }
