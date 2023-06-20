@@ -49,7 +49,7 @@ namespace Apteryx.Routing.Role.Authority
             where TR : class
         {
             var total = query.Count();
-            var data = query.ToPageData(page, limit).Select(fun);
+            var data = query.ToPageData(page, limit).Select(fun).ToList();
             return new PageList<TR>(total, data);
         }
         /// <summary>
