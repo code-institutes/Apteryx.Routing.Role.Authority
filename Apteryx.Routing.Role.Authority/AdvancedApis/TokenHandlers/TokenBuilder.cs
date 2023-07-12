@@ -9,7 +9,7 @@ namespace Apteryx.Routing.Role.Authority
     /// </summary>
     public sealed class TokenBuilder
     {
-        private SecurityKey securityKey = null;
+        private SecurityKey? securityKey;
         private string subject = "";
         private string issuer = "";
         private string audience = "";

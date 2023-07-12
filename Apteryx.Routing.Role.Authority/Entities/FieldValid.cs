@@ -5,11 +5,11 @@
         /// <summary>
         /// 字段名
         /// </summary>
-        public string Field { get; set; }
+        public required string Field { get; set; }
 
         /// <summary>
         /// 错误描述
         /// </summary>
-        public IEnumerable<string> Error { get; set; }
+        public required IEnumerable<string> Error { get; set; }
     }
 }

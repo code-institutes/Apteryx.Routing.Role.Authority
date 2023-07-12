@@ -77,28 +77,28 @@ namespace Apteryx.Routing.Role.Authority
         public async Task<IApteryxResult> Query(QueryOperationLogModel model)
         {
             var query = _db.OperationLogs.AsQueryable().AsQueryable();
-            if (!model.GroupName.IsNullOrWhiteSpace())
+            if (model.GroupName != null && !model.GroupName.IsNullOrWhiteSpace())
                 query = query.Where(w => w.GroupName == model.GroupName);
 
-            if (!model.GroupId.IsNullOrWhiteSpace())
+            if (model.GroupId != null && !model.GroupId.IsNullOrWhiteSpace())
                 query = query.Where(query => query.GroupId == model.GroupId);
 
-            if (!model.AccountId.IsNullOrWhiteSpace())
+            if (model.AccountId != null && !model.AccountId.IsNullOrWhiteSpace())
                 query = query.Where(w => w.SystemAccount.Id == model.AccountId);
 
-            if (!model.ActionDescription.IsNullOrWhiteSpace())
+            if (model.ActionDescription != null && !model.ActionDescription.IsNullOrWhiteSpace())
                 query = query.Where(w => w.ActionDescription == model.ActionDescription);
 
-            if (!model.ActionMethod.IsNullOrWhiteSpace())
+            if (model.ActionMethod != null && !model.ActionMethod.IsNullOrWhiteSpace())
                 query = query.Where(w => w.ActionMethod == model.ActionMethod);
 
-            if (!model.ActionName.IsNullOrWhiteSpace())
+            if (model.ActionName != null && !model.ActionName.IsNullOrWhiteSpace())
                 query = query.Where(w => w.ActionName == model.ActionName);
 
-            if (!model.Remarks.IsNullOrWhiteSpace())
+            if (model.Remarks != null && !model.Remarks.IsNullOrWhiteSpace())
                 query = query.Where(w => w.Remarks.Contains(model.Remarks));
 
-            if (!model.KeyWord.IsNullOrWhiteSpace())
+            if (model.KeyWord != null && !model.KeyWord.IsNullOrWhiteSpace())
                 query = query.Where(w => w.NewData.Contains(model.KeyWord) || w.OldData.Contains(model.KeyWord));
 
             var data = await query.ToPageListAsync(model.Page, model.Limit);

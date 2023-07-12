@@ -22,6 +22,6 @@ namespace Apteryx.Routing.Role.Authority
         /// 路由ID
         /// </summary>
         [RequiredItem(ErrorMessage = "至少选中一个权限")]
-        public IEnumerable<string>? RouteIds { get; set; }
+        public required IEnumerable<string> RouteIds { get; set; }
     }
 }

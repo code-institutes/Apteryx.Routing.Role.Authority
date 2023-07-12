@@ -4,7 +4,7 @@ namespace Apteryx.Routing.Role.Authority
 {
     public static class AES256HandlerApi
     {
-        private static AES256Handler aes256Handler = null;
+        private static AES256Handler? aes256Handler;
 
         /// <summary>
         /// AES加密

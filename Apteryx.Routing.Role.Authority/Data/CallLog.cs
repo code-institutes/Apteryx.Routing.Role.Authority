@@ -4,12 +4,12 @@ namespace Apteryx.Routing.Role.Authority
 {
     public class CallLog : BaseMongoEntity
     {
-        public string TraceIdentifier { get; set; }
+        public required string TraceIdentifier { get; set; }
         public string? IdentityName { get; set; }
         public SystemAccount? SystemAccount { get; set; }
-        public ActionDescriptor ActionDescriptor { get; set; }
-        public Connection Connection { get; set; }
-        public Request Request { get; set; }
+        public required ActionDescriptor ActionDescriptor { get; set; }
+        public required Connection Connection { get; set; }
+        public required Request Request { get; set; }
         public Response? Response { get; set; }
     }
 
@@ -22,7 +22,7 @@ namespace Apteryx.Routing.Role.Authority
 
     public sealed class ActionDescriptor
     {
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
         public string? ActionDescriptorId { get; set; }
         public string? ControllerFullName { get; set; }
         public string? ControllerName { get; set; }

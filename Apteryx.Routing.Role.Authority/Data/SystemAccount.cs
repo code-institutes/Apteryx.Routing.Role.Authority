@@ -10,21 +10,21 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 
         /// </summary>
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         /// <summary>
         /// 邮箱
         /// </summary>
-        public string Email { get; set; }
+        public required string Email { get; set; }
         /// <summary>
         /// 密码
         /// </summary>
         [JsonIgnore]
-        public string Password { get; set; }
+        public required string Password { get; set; }
         /// <summary>
         /// 角色ID
         /// </summary>
         [BsonRepresentation(BsonType.ObjectId)]
-        public string RoleId { get; set; }
+        public required string RoleId { get; set; }
         /// <summary>
         /// 是否超级管理员
         /// </summary>

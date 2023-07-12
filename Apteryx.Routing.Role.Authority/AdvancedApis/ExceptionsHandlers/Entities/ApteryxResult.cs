@@ -34,7 +34,7 @@
         public ApteryxResult(ApteryxCodes code, T result) : this(code, code.ToString(), result)
         {
         }
-        public ApteryxResult(ApteryxCodes code, string msg, T result)
+        public ApteryxResult(ApteryxCodes code, string msg, T? result)
         {
             base.Code = code;
             base.Msg = msg;

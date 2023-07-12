@@ -9,10 +9,6 @@
         /// <summary>
         /// 
         /// </summary>
-        public ApiRoleDescriptionAttribute() { }
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="tag">唯一标签</param>
         /// <param name="name">API名称</param>
         /// <param name="description">API描述</param>

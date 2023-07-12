@@ -8,11 +8,11 @@
         /// <summary>
         /// KEY
         /// </summary>
-        public string Key { get; set; }
+        public required string Key { get; set; }
 
         /// <summary>
         /// 偏移
         /// </summary>
-        public string IV { get; set; }
+        public required string IV { get; set; }
     }
 }

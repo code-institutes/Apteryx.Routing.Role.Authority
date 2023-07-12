@@ -52,9 +52,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var route = new Route()
             {
                 Id = ObjectId.GenerateNewId().ToString(),
+                Name = model.Name.Trim(),
                 CtrlName = model.CtrlName.Trim(),
+                CtrlFullName = model.CtrlName.Trim(),
                 Description = model.Description.Trim(),
                 Method = method,
+                Tag = model.Tag.Trim(),
                 Path = path
             };
             await _db.Routes.AddAsync(route);
@@ -161,13 +164,13 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!model.IsShowMustHave)
                 query = query.Where(w => w.IsMustHave == false);
 
-            if (!title.IsNullOrWhiteSpace())
+            if (title!= null && !title.IsNullOrWhiteSpace())
                 query = query.Where(w => w.CtrlName.Contains(title));
 
-            if (!method.IsNullOrWhiteSpace())
+            if (method != null && !method.IsNullOrWhiteSpace())
                 query = query.Where(w => w.Method.Contains(method));
 
-            if (!path.IsNullOrWhiteSpace())
+            if (path != null && !path.IsNullOrWhiteSpace())
                 query = query.Where(w => w.Path.Contains(path));
 
             var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);
@@ -204,7 +207,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         {
             _initDataService.RefreshRoute();
 
-            var item = _db.Routes.AsQueryable().ToList().GroupBy(g => g.CtrlName).Select(s => new ResultGroupRouteModel()
+            var item = (await _db.Routes.FindAllAsync()).GroupBy(g => g.CtrlName).Select(s => new ResultGroupRouteModel()
             {
                 CtrlName = s.Key,
                 Routes = s.Select(ss => ss)

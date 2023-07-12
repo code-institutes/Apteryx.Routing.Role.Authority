@@ -99,7 +99,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Post([FromBody] AddSystemAccountModel model)
         {
-            var email = model.Email?.Trim();
+            var email = model.Email.Trim();
             var pwd = model.Password.Trim();
 
 
@@ -290,13 +290,13 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             var query = _db.SystemAccounts.AsQueryable().AsQueryable();
 
-            if (!model.Name.IsNullOrWhiteSpace())
+            if (model.Name != null && !model.Name.IsNullOrWhiteSpace())
                 query = query.Where(x => x.Name.Contains(model.Name));
 
-            if (!model.Email.IsNullOrWhiteSpace())
+            if (model.Email != null && !model.Email.IsNullOrWhiteSpace())
                 query = query.Where(x => x.Email.Contains(model.Email));
 
-            if (!model.RoleId.IsNullOrWhiteSpace())
+            if (model.RoleId != null && !model.RoleId.IsNullOrWhiteSpace())
                 query = query.Where(x => x.RoleId == model.RoleId);
 
             var data = await query.OrderByDescending(o => o.Id).ToPageListAsync(model.Page, model.Limit);

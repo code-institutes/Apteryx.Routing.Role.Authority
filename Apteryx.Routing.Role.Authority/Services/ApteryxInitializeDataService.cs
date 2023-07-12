@@ -94,9 +94,12 @@ namespace Apteryx.Routing.Role.Authority
 
                 var ctrlActDesc = (ControllerActionDescriptor)action;
 
-                if (action.ActionConstraints.Any())
+                if (action.ActionConstraints != null && action.ActionConstraints.Any())
                 {
                     var methodActionConstraint = action.ActionConstraints.First(f => f.GetType() == typeof(HttpMethodActionConstraint)) as HttpMethodActionConstraint;
+                    if (methodActionConstraint == null)
+                        continue;
+
                     httpMethods = string.Join(',', methodActionConstraint.HttpMethods.Select(s => s));
                 }
 

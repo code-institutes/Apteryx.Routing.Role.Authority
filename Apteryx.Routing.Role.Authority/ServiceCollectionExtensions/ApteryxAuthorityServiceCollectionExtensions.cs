@@ -85,6 +85,8 @@ namespace Apteryx.Routing.Role.Authority
                     if (config.IsSecurityToken)
                     {
                         options.SecurityTokenValidators.Clear();
+                        if (config.AESConfig == null)
+                            throw new Exception("当在配置文件“WebConfig”节点下开启加密Token后，“AESConfig”配置不能为空！");
                         options.SecurityTokenValidators.Add(new TokenValidator(config.AESConfig.Key, config.AESConfig.IV));
                     }
                     options.TokenValidationParameters = new TokenValidationParameters

@@ -9,6 +9,6 @@
     public interface IApteryxResult<out T> : IApteryxResult
         where T : class
     {
-        T Result { get; }
+        T? Result { get; }
     }
 }

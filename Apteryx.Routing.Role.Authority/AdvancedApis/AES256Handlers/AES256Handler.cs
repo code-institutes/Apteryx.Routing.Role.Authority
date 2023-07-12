@@ -33,7 +33,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <returns>密文</returns>
         public string Encrypt(string encryptStr, string key, string iv)
         {
-            RijndaelManaged rijndaelCipher = new RijndaelManaged();
+            var rijndaelCipher = DES.Create();
             rijndaelCipher.Mode = CipherMode.CBC;
             rijndaelCipher.Padding = PaddingMode.PKCS7;
             rijndaelCipher.KeySize = 128;
@@ -80,7 +80,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <returns>明文</returns>
         public string Decrypt(string decryptStr, string key, string iv)
         {
-            RijndaelManaged rijndaelCipher = new RijndaelManaged();
+            var rijndaelCipher = DES.Create();
             rijndaelCipher.Mode = CipherMode.CBC;
             rijndaelCipher.Padding = PaddingMode.PKCS7;
             rijndaelCipher.KeySize = 128;
