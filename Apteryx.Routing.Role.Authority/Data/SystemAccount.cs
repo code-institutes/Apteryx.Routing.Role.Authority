@@ -19,7 +19,7 @@ namespace Apteryx.Routing.Role.Authority
         /// 密码
         /// </summary>
         [JsonIgnore]
-        public required string Password { get; set; }
+        public string Password { get; set; }
         /// <summary>
         /// 角色ID
         /// </summary>
