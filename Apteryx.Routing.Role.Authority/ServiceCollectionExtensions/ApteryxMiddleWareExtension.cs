@@ -16,7 +16,7 @@ namespace Apteryx.Routing.Role.Authority
             app.UseSwagger(c => { c.RouteTemplate = routePrefix + "/{documentName}/swagger.json"; });
             app.UseSwaggerUI(c =>
             {
-                c.DocumentTitle = "Apteryx RestfulAPIs Documentation";
+                c.DocumentTitle = "Routing Address Control-based Role Authorization System";
                 c.SwaggerEndpoint($"/{routePrefix}/apteryx1.0/swagger.json", "Restful APIs Documentation");
                 c.RoutePrefix = routePrefix;
                 c.DefaultModelExpandDepth(2);

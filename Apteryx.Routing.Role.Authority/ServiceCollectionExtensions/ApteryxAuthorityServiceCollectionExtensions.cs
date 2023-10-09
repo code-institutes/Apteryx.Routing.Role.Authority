@@ -112,7 +112,7 @@ namespace Apteryx.Routing.Role.Authority
             {
                 c.SwaggerDoc("apteryx1.0", new OpenApiInfo
                 {
-                    Title = "Apteryx RestfulAPIs Documentation",
+                    Title = "Routing Address Control-based Role Authorization System",
                     Version = "v1.0",
                     Contact = new OpenApiContact
                     {
