@@ -18,13 +18,13 @@ namespace Apteryx.Routing.Role.Authority
         public async Task CreateAsync<T>(T? newData, T? oldData, string? remarks = null)
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.SystemAccounts.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.CallLogs.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
 
-            await _db.OperationLogs.AddAsync(new OperationLog(
+            await _db.ApteryxOperationLog.AddAsync(new OperationLog(
                     callLog.TraceIdentifier,
                     actDesc.ActionDescriptorId,
                     actDesc.GroupName,
@@ -43,13 +43,13 @@ namespace Apteryx.Routing.Role.Authority
         public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null)
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.SystemAccounts.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.CallLogs.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
 
-            await _db.OperationLogs.AddAsync(clientSession, new OperationLog(
+            await _db.ApteryxOperationLog.AddAsync(clientSession, new OperationLog(
                     callLog.TraceIdentifier,
                     actDesc.ActionDescriptorId,
                     actDesc.GroupName,
@@ -68,7 +68,7 @@ namespace Apteryx.Routing.Role.Authority
 
         public async Task<IApteryxResult> GetAsync(string id)
         {
-            var log = await _db.OperationLogs.FindOneAsync(id);
+            var log = await _db.ApteryxOperationLog.FindOneAsync(id);
             if (log == null)
                 return ApteryxResultApi.Fail(ApteryxCodes.操作日志不存在);
             return ApteryxResultApi.Susuccessful(log);
@@ -76,7 +76,7 @@ namespace Apteryx.Routing.Role.Authority
 
         public async Task<IApteryxResult> Query(QueryOperationLogModel model)
         {
-            var query = _db.OperationLogs.AsQueryable().AsQueryable();
+            var query = _db.ApteryxOperationLog.AsMongoCollection.AsQueryable().AsQueryable();
             if (model.GroupName != null && !model.GroupName.IsNullOrWhiteSpace())
                 query = query.Where(w => w.GroupName == model.GroupName);
 

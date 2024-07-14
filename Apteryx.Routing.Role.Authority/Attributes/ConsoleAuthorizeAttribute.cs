@@ -52,7 +52,7 @@ namespace Apteryx.Routing.Role.Authority
                 };
 
                 var traceIdentifier = context.HttpContext.TraceIdentifier;
-                _db.CallLogs.UpdateOne(u => u.TraceIdentifier == context.HttpContext.TraceIdentifier, Builders<CallLog>.Update.Set(s => s.Response, response));
+                _db.ApteryxCallLog.UpdateOne(u => u.TraceIdentifier == context.HttpContext.TraceIdentifier, Builders<CallLog>.Update.Set(s => s.Response, response));
                 return;
             }
             catch { }
@@ -127,7 +127,7 @@ namespace Apteryx.Routing.Role.Authority
             {
                 var accountId = httpContext.User.Identity.Name;
                 callLog.IdentityName = accountId;
-                callLog.SystemAccount = _db.SystemAccounts.FindOne(accountId);
+                callLog.SystemAccount = _db.ApteryxSystemAccount.FindOne(accountId);
             }
 
             if (!context.ModelState.IsValid)
@@ -150,10 +150,10 @@ namespace Apteryx.Routing.Role.Authority
                     Result = resultValue.ToJson(),
                     Type = resultValue?.GetType().ToString()
                 };
-                _db.CallLogs.Add(callLog);
+                _db.ApteryxCallLog.Add(callLog);
                 return;
             }
-            _db.CallLogs.Add(callLog);
+            _db.ApteryxCallLog.Add(callLog);
             return;
         }
 
@@ -165,7 +165,7 @@ namespace Apteryx.Routing.Role.Authority
                 var template = $"/{context.ActionDescriptor.AttributeRouteInfo?.Template}";
                 var accountId = context.HttpContext.User.Identity.Name;
 
-                var systemAccount = _db.SystemAccounts.FindOne(f => f.Id == accountId);
+                var systemAccount = _db.ApteryxSystemAccount.FindOne(f => f.Id == accountId);
                 if (systemAccount == null)
                 {
                     context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.Unauthorized, $"您的账户已被删除，无法继续操作！")) { StatusCode = 200 };
@@ -180,17 +180,17 @@ namespace Apteryx.Routing.Role.Authority
                     return;
                 }
 
-                var route = _db.Routes.FindOne(f => f.Method == method && f.Path == template);
+                var route = _db.ApteryxRoute.FindOne(f => f.Method == method && f.Path == template);
                 if (route != null)
                 {
-                    var roleRoute = _db.Roles.FindOne(f => f.Id == systemAccount.RoleId && f.RouteIds.Contains(route.Id));
+                    var roleRoute = _db.ApteryxRole.FindOne(f => f.Id == systemAccount.RoleId && f.RouteIds.Contains(route.Id));
                     if (roleRoute != null)
                     {
                         return;
                     }
                     else
                     {
-                        var role = _db.Roles.FindOne(systemAccount.RoleId);
+                        var role = _db.ApteryxRole.FindOne(systemAccount.RoleId);
                         context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.权限不足, $"角色“{role.Name}”无权限访问“{route.CtrlName}”的“{route.Name}”接口！")) { StatusCode = 200 };
                         return;
                     }

@@ -55,7 +55,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
             var pwd = model.Password.ToSHA1();
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
             if (account == null)
             {
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账号或密码错误));
@@ -64,7 +64,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             if (!account.State)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户已被禁用));
 
-            var role = await _db.Roles.FindOneAsync(f => f.Id == account.RoleId);
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == account.RoleId);
 
             var token = new TokenBuilder()
                 .AddAudience(_jwtConfig.TokenConfig.Audience)
@@ -103,12 +103,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var pwd = model.Password.Trim();
 
 
-            var check = await _db.SystemAccounts.FindOneAsync(f => f.Email == email);
+            var check = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Email == email);
             if (check != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
 
-            var role = await _db.Roles.FindOneAsync(f => f.Id == model.RoleId);
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == model.RoleId);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, "该角色不存在"));
 
@@ -120,7 +120,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 Password = pwd.ToSHA1(),
                 RoleId = model.RoleId
             };
-            await _db.SystemAccounts.AddAsync(account);
+            await _db.ApteryxSystemAccount.AddAsync(account);
             await _log.CreateAsync(account, null);
             return Ok(ApteryxResultApi.Susuccessful(account));
         }
@@ -136,7 +136,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
         public async Task<IActionResult> Get([SwaggerParameter("账户ID", Required = false)] string id)
         {
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == id);
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
             return Ok(ApteryxResultApi.Susuccessful(account));
@@ -159,18 +159,18 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var pwd = model.Password?.Trim();
             var roleId = model.RoleId?.Trim();
 
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id != accountId && f.Email == email);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id != accountId && f.Email == email);
             if (account != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, $"已存在邮箱为：“{email}”的账户"));
 
-            account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
+            account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == accountId);
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
             if (account.IsSuper == true && account.Id != HttpContext.GetAccountId())
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
 
-            var role = await _db.Roles.FindOneAsync(f => f.Id == roleId);
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == roleId);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{roleId}”"));
 
@@ -179,7 +179,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             account.Email = email;
             account.Password = pwd.ToSHA1();
 
-            var result = await _db.SystemAccounts.FindOneAndReplaceOneAsync(f => f.Id == accountId, account);
+            var result = await _db.ApteryxSystemAccount.FindOneAndReplaceOneAsync(f => f.Id == accountId, account);
             await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful(account));
@@ -199,20 +199,20 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var accountId = HttpContext.GetAccountId();
 
             var oldpwd = model.OldPassword.ToSHA1();
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId && f.Email == model.OldEmail && f.Password == oldpwd);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == accountId && f.Email == model.OldEmail && f.Password == oldpwd);
             if (account == null)
             {
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账号或密码错误));
             }
 
-            var check = await _db.SystemAccounts.FindOneAsync(f => f.Email == model.NewEmail.Trim() && f.Id != account.Id);
+            var check = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Email == model.NewEmail.Trim() && f.Id != account.Id);
             if (check != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
             account.Email = model.NewEmail.Trim();
             account.Password = model.NewPassword.Trim().ToSHA1();
 
-            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
+            var result = await _db.ApteryxSystemAccount.FindOneAndUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
                 .Update
                 .Set(s => s.Email, account.Email)
                 .Set(s => s.Password, account.Password));
@@ -235,7 +235,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         {
             var id = model.Id;
 
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == id);
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
@@ -244,7 +244,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
             account.State = !account.State;
 
-            var result = await _db.SystemAccounts.FindOneAndUpdateOneAsync(u => u.Id == id, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
+            var result = await _db.ApteryxSystemAccount.FindOneAndUpdateOneAsync(u => u.Id == id, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
             await _log.CreateAsync(account, result);
 
             return Ok(ApteryxResultApi.Susuccessful(account));
@@ -261,14 +261,14 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
         public async Task<IActionResult> Delete(string id)
         {
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == id);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == id);
             if (account == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
             if (account.IsSuper == true)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
 
-            await _db.SystemAccounts.DeleteOneAsync(f => f.Id == id);
+            await _db.ApteryxSystemAccount.DeleteOneAsync(f => f.Id == id);
             await _log.CreateAsync(null, account);
 
             return Ok(ApteryxResultApi.Susuccessful());
@@ -288,7 +288,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var pindex = model.Page;
             var rowCount = model.Limit;
 
-            var query = _db.SystemAccounts.AsQueryable().AsQueryable();
+            var query = _db.ApteryxSystemAccount.AsMongoCollection.AsQueryable().AsQueryable();
 
             if (model.Name != null && !model.Name.IsNullOrWhiteSpace())
                 query = query.Where(x => x.Name.Contains(model.Name));

@@ -35,7 +35,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Role>))]
         public async Task<IActionResult> Post([FromBody] AddRoleModel model)
         {
-            var role = await _db.Roles.FindOneAsync(f => f.Name == model.Name.Trim());
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Name == model.Name.Trim());
             if (role != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色已存在, $"角色名：\"{model.Name}\"已存在"));
 
@@ -44,11 +44,11 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 Id = ObjectId.GenerateNewId().ToString(),
                 Name = model.Name.Trim(),
                 Description = model.Description?.Trim(),
-                RouteIds = _db.Routes.AsQueryable().Where(w => w.IsMustHave == true).Select(s => s.Id).ToList()
+                RouteIds = _db.ApteryxRoute.AsMongoCollection.AsQueryable().Where(w => w.IsMustHave == true).Select(s => s.Id).ToList()
             };
 
-            model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
-            await _db.Roles.AddAsync(role);
+            model.RouteIds.Where(w => _db.ApteryxRoute.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
+            await _db.ApteryxRole.AddAsync(role);
             //记录日志
             //await _log.CreateAsync(role, null);
             await _log.CreateAsync(role, null);
@@ -68,22 +68,22 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         public async Task<IActionResult> Put([FromBody] EditRoleModel model)
         {
             var roleId = model.Id;
-            var role = await _db.Roles.FindOneAsync(f => f.Id == roleId);
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == roleId);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{roleId}"));
 
             if (role.AddType == AddTypes.程序 && role.Name == "管理员")
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "禁止操作系统默认角色！"));
 
-            if (_db.Roles.FindOne(a => a.Name == model.Name && a.Id != model.Id) != null)
+            if (_db.ApteryxRole.FindOne(a => a.Name == model.Name && a.Id != model.Id) != null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色已存在, $"角色名：\"{model.Name}\"已存在"));
 
             role.Name = model.Name;
             role.Description = model.Description;
-            role.RouteIds = _db.Routes.AsQueryable().Where(w => w.IsMustHave == true).Select(s => s.Id).ToList();
+            role.RouteIds = _db.ApteryxRoute.AsMongoCollection.AsQueryable().Where(w => w.IsMustHave == true).Select(s => s.Id).ToList();
 
-            model.RouteIds.Where(w => _db.Routes.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
-            var result = await _db.Roles.FindOneAndReplaceOneAsync(r => r.Id == role.Id, role);
+            model.RouteIds.Where(w => _db.ApteryxRoute.FindOne(a => a.Id == w && a.IsMustHave == false) != null).ToList().ForEach(f => role.RouteIds.Add(f));
+            var result = await _db.ApteryxRole.FindOneAndReplaceOneAsync(r => r.Id == role.Id, role);
             //记录日志
             await _log.CreateAsync(role, result);
 
@@ -102,18 +102,18 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         public async Task<IActionResult> GetOwn()
         {
             var accountId = HttpContext.GetAccountId();
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
-            var routes = _db.Routes.FindAll();
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == accountId);
+            var routes = _db.ApteryxRoute.FindAll();
 
             var data = new ResultOwnRouteModel()
             {
-                Role = await _db.Roles.FindOneAsync(account.RoleId),
+                Role = await _db.ApteryxRole.FindOneAsync(account.RoleId),
                 GroupRoutes = routes.GroupBy(g => g.CtrlName).Select(s => new GroupRouteModel()
                 {
                     Title = s.Key,
                     RouteInfo = s.Select(ss => new RouteInfoModel()
                     {
-                        IsOwn = _db.Roles.FindOne(f => f.Id == account.RoleId && f.RouteIds.Contains(ss.Id)) != null,
+                        IsOwn = _db.ApteryxRole.FindOne(f => f.Id == account.RoleId && f.RouteIds.Contains(ss.Id)) != null,
                         Route = ss
                     })
                 })
@@ -133,9 +133,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         public async Task<IActionResult> GetOnlyOwn()
         {
             var accountId = HttpContext.GetAccountId();
-            var account = await _db.SystemAccounts.FindOneAsync(f => f.Id == accountId);
-            var routes = _db.Routes.FindAll();
-            var role = await _db.Roles.FindOneAsync(account.RoleId);
+            var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == accountId);
+            var routes = _db.ApteryxRoute.FindAll();
+            var role = await _db.ApteryxRole.FindOneAsync(account.RoleId);
             var data = role.RouteIds.Select(s => routes.FirstOrDefault(f => f.Id == s));
             return Ok(ApteryxResultApi.Susuccessful(data));
         }
@@ -150,21 +150,21 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<ResultOwnRouteModel>>))]
         public async Task<IActionResult> Get([SwaggerParameter("角色ID", Required = true)] string id)
         {
-            var role = await _db.Roles.FindOneAsync(f => f.Id == id);
+            var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == id);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{id}"));
 
-            var routes = _db.Routes.FindAll();
+            var routes = _db.ApteryxRoute.FindAll();
 
             var data = new ResultOwnRouteModel()
             {
-                Role = await _db.Roles.FindOneAsync(id),
+                Role = await _db.ApteryxRole.FindOneAsync(id),
                 GroupRoutes = routes.GroupBy(g => g.CtrlName).Select(s => new GroupRouteModel()
                 {
                     Title = s.Key,
                     RouteInfo = s.Select(ss => new RouteInfoModel()
                     {
-                        IsOwn = _db.Roles.FindOne(f => f.Id == id && f.RouteIds.Contains(ss.Id)) != null,
+                        IsOwn = _db.ApteryxRole.FindOne(f => f.Id == id && f.RouteIds.Contains(ss.Id)) != null,
                         Route = ss
                     })
                 })
@@ -183,22 +183,22 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
         public async Task<IActionResult> Delete([SwaggerParameter("角色ID", Required = true)] string id)
         {
-            var role = await _db.Roles.FindOneAsync(d => d.Id == id);
+            var role = await _db.ApteryxRole.FindOneAsync(d => d.Id == id);
             if (role == null)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"角色不存在,ID:{id}"));
 
             if (role.AddType == AddTypes.程序)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.系统角色, "系统默认角色禁止删除！"));
 
-            await _db.Roles.DeleteOneAsync(d => d.Id == id);
+            await _db.ApteryxRole.DeleteOneAsync(d => d.Id == id);
 
             var groupId = ObjectId.GenerateNewId().ToString();
             //记录日志
             await _log.CreateAsync(null, role);
 
-            foreach (var sysAccount in _db.SystemAccounts.Where(w => w.RoleId == id))
+            foreach (var sysAccount in _db.ApteryxSystemAccount.Where(w => w.RoleId == id).ToEnumerable())
             {
-                var sysAccountResult = _db.SystemAccounts.DeleteOne(d => d.Id == sysAccount.Id);
+                var sysAccountResult = _db.ApteryxSystemAccount.DeleteOne(sysAccount.Id);
                 if (sysAccountResult.IsAcknowledged)
                 {
                     //记录日志
@@ -222,7 +222,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             var limit = model.Limit;
             var key = model.Key;
 
-            var query = _db.Roles.AsQueryable().AsQueryable();
+            var query = _db.ApteryxRole.AsMongoCollection.AsQueryable().AsQueryable();
 
             if (!string.IsNullOrEmpty(key))
                 query = query.Where(w => w.Name.Contains(key) || w.Description.Contains(key));
@@ -238,9 +238,9 @@ namespace Apteryx.Routing.Role.Authority.Controllers
             Tags = new[] { "Role" })]
         [ApiRoleDescription("G", "获取所有")]
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Role>>))]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
-            return Ok(ApteryxResultApi.Susuccessful(await _db.Roles.FindAllAsync()));
+            return Ok(ApteryxResultApi.Susuccessful(_db.ApteryxRole.FindAll()));
         }
 
         //[HttpGet("report/usage/{roleId}")]

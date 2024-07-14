@@ -10,22 +10,22 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 系统账户信息
         /// </summary>
-        public IMongoCollection<SystemAccount> SystemAccounts => Database.GetCollection<SystemAccount>("ApteryxSystemAccount");
+        public DbSet<SystemAccount> ApteryxSystemAccount { get; set; }
         /// <summary>
         /// 角色
         /// </summary>
-        public IMongoCollection<Role> Roles => Database.GetCollection<Role>("ApteryxRole");
+        public DbSet<Role> ApteryxRole { get; set; }
         /// <summary>
         /// 路由
         /// </summary>
-        public IMongoCollection<Route> Routes => Database.GetCollection<Route>("ApteryxRoute");
+        public DbSet<Route> ApteryxRoute {  get; set; }
         /// <summary>
         /// 接口调用日志
         /// </summary>
-        public IMongoCollection<CallLog> CallLogs => Database.GetCollection<CallLog>("ApteryxCallLog");
+        public DbSet<CallLog> ApteryxCallLog {  get; set; }
         /// <summary>
         /// 操作日志
         /// </summary>
-        public IMongoCollection<OperationLog> OperationLogs => Database.GetCollection<OperationLog>("ApteryxOperationLog");
+        public DbSet<OperationLog> ApteryxOperationLog {  get; set; }
     }
 }
