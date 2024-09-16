@@ -1,4 +1,5 @@
 ﻿using Apteryx.MongoDB.Driver.Extend;
+using Apteryx.Routing.Role.Authority.Attributes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,10 +85,13 @@ namespace Apteryx.Routing.Role.Authority
                     };
                     if (config.IsSecurityToken)
                     {
-                        options.SecurityTokenValidators.Clear();
+                        //options.UseSecurityTokenValidators = true;
+                        //options.SecurityTokenValidators.Clear();
                         if (config.AESConfig == null)
                             throw new Exception("当在配置文件“WebConfig”节点下开启加密Token后，“AESConfig”配置不能为空！");
-                        options.SecurityTokenValidators.Add(new TokenValidator(config.AESConfig.Key, config.AESConfig.IV));
+                        //options.SecurityTokenValidators.Add(new TokenValidator(config.AESConfig.Key, config.AESConfig.IV));
+
+                        options.TokenHandlers.Add(new CustomTokenHandler(config.AESConfig.Key, config.AESConfig.IV));
                     }
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -100,8 +104,7 @@ namespace Apteryx.Routing.Role.Authority
                         ValidateLifetime = true, //是否验证失效时间
 
                         ValidateIssuerSigningKey = true, //是否验证SecurityKey
-                        IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.TokenConfig.Key)), //拿到SecurityKey
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.TokenConfig.Key)), //拿到SecurityKey
 
                         ClockSkew = TimeSpan.Zero
                     };

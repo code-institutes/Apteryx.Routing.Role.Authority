@@ -33,20 +33,22 @@ namespace Apteryx.Routing.Role.Authority
         /// <returns>密文</returns>
         public string Encrypt(string encryptStr, string key, string iv)
         {
-            var rijndaelCipher = DES.Create();
-            rijndaelCipher.Mode = CipherMode.CBC;
-            rijndaelCipher.Padding = PaddingMode.PKCS7;
-            rijndaelCipher.KeySize = 128;
-            rijndaelCipher.BlockSize = 128;
-            byte[] pwdBytes = Encoding.UTF8.GetBytes(key);
-            byte[] keyBytes = new byte[16];
-            int len = pwdBytes.Length;
-            if (len > keyBytes.Length) len = keyBytes.Length;
-            Array.Copy(pwdBytes, keyBytes, len);
-            rijndaelCipher.Key = keyBytes;
+            var aesCipher = Aes.Create();
+            aesCipher.Mode = CipherMode.CBC;
+            aesCipher.Padding = PaddingMode.PKCS7;
+            aesCipher.KeySize = 256;
+            aesCipher.BlockSize = 128;
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            rijndaelCipher.IV = ivBytes;
-            ICryptoTransform transform = rijndaelCipher.CreateEncryptor();
+
+            if (keyBytes.Length != 32)
+                throw new ArgumentException("Key length must be 32 bytes.");
+            if (ivBytes.Length != 16)
+                throw new ArgumentException("IV length must be 16 bytes.");
+
+            aesCipher.Key = keyBytes;
+            aesCipher.IV = ivBytes;
+            ICryptoTransform transform = aesCipher.CreateEncryptor();
             byte[] plainText = Encoding.UTF8.GetBytes(encryptStr);
             byte[] cipherBytes = transform.TransformFinalBlock(plainText, 0, plainText.Length);
             return Convert.ToBase64String(cipherBytes);
@@ -80,23 +82,26 @@ namespace Apteryx.Routing.Role.Authority
         /// <returns>明文</returns>
         public string Decrypt(string decryptStr, string key, string iv)
         {
-            var rijndaelCipher = DES.Create();
-            rijndaelCipher.Mode = CipherMode.CBC;
-            rijndaelCipher.Padding = PaddingMode.PKCS7;
-            rijndaelCipher.KeySize = 128;
-            rijndaelCipher.BlockSize = 128;
+            var aesCipher = Aes.Create();
+            aesCipher.Mode = CipherMode.CBC;
+            aesCipher.Padding = PaddingMode.PKCS7;
+            aesCipher.KeySize = 256;
+            aesCipher.BlockSize = 128;
             byte[] encryptedData = Convert.FromBase64String(decryptStr);
-            byte[] pwdBytes = Encoding.UTF8.GetBytes(key);
-            byte[] keyBytes = new byte[16];
-            int len = pwdBytes.Length;
-            if (len > keyBytes.Length) len = keyBytes.Length;
-            Array.Copy(pwdBytes, keyBytes, len);
-            rijndaelCipher.Key = keyBytes;
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            rijndaelCipher.IV = ivBytes;
-            ICryptoTransform transform = rijndaelCipher.CreateDecryptor();
+
+            if (keyBytes.Length != 32)
+                throw new ArgumentException("Key length must be 16 bytes.");
+            if (ivBytes.Length != 16)
+                throw new ArgumentException("IV length must be 16 bytes.");
+
+            aesCipher.Key = keyBytes;
+            aesCipher.IV = ivBytes;
+            ICryptoTransform transform = aesCipher.CreateDecryptor();
             byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
             return Encoding.UTF8.GetString(plainText);
         }
+
     }
 }
