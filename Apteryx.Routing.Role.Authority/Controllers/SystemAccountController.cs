@@ -72,7 +72,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .AddSubject(Guid.NewGuid().ToString())
                 .AddExpiry(_jwtConfig.TokenConfig.Expires)
                 .AddIssuer(_jwtConfig.TokenConfig.Issuer)
-                .AddSecurityKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.TokenConfig.Key)))
+                .AddSecurityKey(_jwtConfig.TokenConfig.Key)
                 .Build();
             if (_jwtConfig.IsSecurityToken)
             {

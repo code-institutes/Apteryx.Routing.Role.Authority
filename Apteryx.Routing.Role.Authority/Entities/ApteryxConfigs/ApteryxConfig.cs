@@ -10,7 +10,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// Token配置
         /// </summary>
-        public TokenSetting? TokenConfig { get; set; }
+        public required TokenSetting TokenConfig { get; set; }
 
         /// <summary>
         /// 是否开启加密Token

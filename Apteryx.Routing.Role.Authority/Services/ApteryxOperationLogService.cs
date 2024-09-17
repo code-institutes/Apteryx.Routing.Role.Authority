@@ -1,5 +1,4 @@
 ﻿using apteryx.common.extend.Helpers;
-using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 

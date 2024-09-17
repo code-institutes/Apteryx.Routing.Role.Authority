@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Apteryx.Routing.Role.Authority
@@ -21,10 +22,17 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         /// <param name="securityKey"></param>
         /// <returns></returns>
-        public TokenBuilder AddSecurityKey(SecurityKey securityKey)
+        private TokenBuilder AddSecurityKey(SecurityKey securityKey)
         {
             this.securityKey = securityKey;
             return this;
+        }
+
+        public TokenBuilder AddSecurityKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+            return AddSecurityKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)));
         }
         /// <summary>
         /// 
