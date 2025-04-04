@@ -74,7 +74,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
                 .AddIssuer(_jwtConfig.TokenConfig.Issuer)
                 .AddSecurityKey(_jwtConfig.TokenConfig.Key)
                 .Build();
-            if (_jwtConfig.IsSecurityToken)
+            if (_jwtConfig.UseSecurityToken)
             {
                 var aesConfig = _jwtConfig.AESConfig;
                 return Ok(ApteryxResultApi.Susuccessful(new Token<ResultSystemAccountRoleModel>(token, aesConfig.Key, aesConfig.IV, new ResultSystemAccountRoleModel(account, role))));

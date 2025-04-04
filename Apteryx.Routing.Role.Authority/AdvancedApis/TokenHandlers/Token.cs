@@ -13,7 +13,7 @@ namespace Apteryx.Routing.Role.Authority
             this.ValidTo = securityToken.ValidTo;
             this.AppendInfo = obj;
         }
-        public Token(JwtSecurityToken accessSecurityToken, string aesKey, string aesIv,T? obj)
+        public Token(JwtSecurityToken accessSecurityToken, string aesKey, string aesIv, T? obj)
         {
             this.AccessToken = AES256HandlerApi.Encrypt(new JwtSecurityTokenHandler().WriteToken(accessSecurityToken), aesKey, aesIv);
             this.ValidTo = accessSecurityToken.ValidTo;
@@ -27,7 +27,7 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 访问凭证(JWT协议)
         /// </summary>
-        public string AccessToken {get; set;}
+        public string AccessToken { get; set; }
         /// <summary>
         /// 前缀
         /// </summary>

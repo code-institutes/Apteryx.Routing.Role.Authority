@@ -1,5 +1,4 @@
 ﻿using apteryx.common.extend.Helpers;
-using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using MongoDB.Driver;
@@ -25,7 +24,7 @@ namespace Apteryx.Routing.Role.Authority
             {
                 try
                 {
-                    context.Result = new OkObjectResult(ApteryxResultApi.Fail(ApteryxCodes.发生未知错误, context.Exception.Message))
+                    context.Result = new OkObjectResult(ApteryxResultApi.Fail(ApteryxCodes.发生未知错误, context.Exception?.Message))
                     {
                         StatusCode = 200
                     };
@@ -168,7 +167,7 @@ namespace Apteryx.Routing.Role.Authority
                 var systemAccount = _db.ApteryxSystemAccount.FindOne(f => f.Id == accountId);
                 if (systemAccount == null)
                 {
-                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.Unauthorized, $"您的账户已被删除，无法继续操作！")) { StatusCode = 200 };
+                    context.Result = new BadRequestObjectResult(ApteryxResultApi.Fail(ApteryxCodes.Unauthorized, $"您的账户可能已被删除，无法继续操作！")) { StatusCode = 200 };
                     return;
                 }
                 if (systemAccount.IsSuper)

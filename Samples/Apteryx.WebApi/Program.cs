@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddApteryxAuthority(new ApteryxConfig()
 {
-    IsSecurityToken = true,
+    UseSecurityToken = true,
     AESConfig = new AES256Setting()
     {
         Key = "fND+T_yo@wc!$uEEw!mDjqN9wYcvuO2I",

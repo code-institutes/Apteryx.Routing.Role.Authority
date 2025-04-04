@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Apteryx.Routing.Role.Authority
 {
-    public class AES256Handler
+    public sealed class AES256Handler
     {
         ///// <summary>
         ///// AES加密

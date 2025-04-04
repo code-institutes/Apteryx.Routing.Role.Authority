@@ -13,9 +13,9 @@ namespace Apteryx.Routing.Role.Authority
         public required TokenSetting TokenConfig { get; set; }
 
         /// <summary>
-        /// 是否开启加密Token
+        /// 是否使用加密Token
         /// </summary>
-        public bool IsSecurityToken { get; set; } = false;
+        public bool UseSecurityToken { get; set; } = false;
 
         /// <summary>
         /// AES加密配置

@@ -31,7 +31,7 @@ namespace Apteryx.Routing.Role.Authority
                 throw new Exception("“MongoDBOptions”配置不能为空！");
             if (config.TokenConfig == null)
                 throw new Exception("“TokenConfig”配置不能为空！");
-            if (config.IsSecurityToken)
+            if (config.UseSecurityToken)
                 if (config.AESConfig == null)
                     throw new Exception("当开启加密Token设置后，“AESConfig”配置不能为空！");
             services.AddSingleton(config);
@@ -83,7 +83,7 @@ namespace Apteryx.Routing.Role.Authority
                         //    //return Task.CompletedTask;
                         //}
                     };
-                    if (config.IsSecurityToken)
+                    if (config.UseSecurityToken)
                     {
                         //options.UseSecurityTokenValidators = true;
                         //options.SecurityTokenValidators.Clear();

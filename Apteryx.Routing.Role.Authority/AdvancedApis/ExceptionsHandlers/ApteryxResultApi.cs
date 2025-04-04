@@ -29,7 +29,7 @@
         /// <param name="code">异常代码</param>
         /// <param name="msg">异常说明</param>
         /// <returns>返回 CGIObjectResult 类型</returns>
-        public static ApteryxResult Fail(ApteryxCodes code, string msg) => new ApteryxResult(code, msg);
+        public static ApteryxResult Fail(ApteryxCodes code, string? msg) => new ApteryxResult(code, msg);
         /// <summary>
         /// 请求异常
         /// </summary>
