@@ -12,9 +12,9 @@ namespace Apteryx.Routing.Role.Authority.Attributes
         public CustomTokenHandler(string key, string iv)
         {
             if (key.Length != 32)
-                throw new ArgumentException("Key length must be 32 bytes for AES-256.");
+                throw new ArgumentException("AES Key length must be 32 bytes for AES-256.");
             if (iv.Length != 16)
-                throw new ArgumentException("IV length must be 16 bytes.");
+                throw new ArgumentException("AES IV length must be 16 bytes.");
 
             this.key = key;
             this.iv = iv;

@@ -11,7 +11,7 @@ namespace Apteryx.Routing.Role.Authority
         /// 角色名
         /// </summary>
         [Required(ErrorMessage ="“角色名”必填")]
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// 描述

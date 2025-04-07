@@ -42,9 +42,9 @@ namespace Apteryx.Routing.Role.Authority
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
 
             if (keyBytes.Length != 32)
-                throw new ArgumentException("Key length must be 32 bytes.");
+                throw new ArgumentException("AES Key length must be 32 bytes.");
             if (ivBytes.Length != 16)
-                throw new ArgumentException("IV length must be 16 bytes.");
+                throw new ArgumentException("AES IV length must be 16 bytes.");
 
             aesCipher.Key = keyBytes;
             aesCipher.IV = ivBytes;
@@ -102,6 +102,5 @@ namespace Apteryx.Routing.Role.Authority
             byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
             return Encoding.UTF8.GetString(plainText);
         }
-
     }
 }

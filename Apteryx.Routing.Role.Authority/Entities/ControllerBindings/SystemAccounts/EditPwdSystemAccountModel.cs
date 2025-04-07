@@ -12,25 +12,25 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         [EmailAddress]
         [Required(ErrorMessage = "旧邮箱必填")]
-        public string? OldEmail { get; set; }
+        public required string OldEmail { get; set; }
 
         /// <summary>
         /// 原密码
         /// </summary>
         [Required(ErrorMessage ="旧密码必填")]
-        public string? OldPassword { get; set; }
+        public required string OldPassword { get; set; }
 
         /// <summary>
         /// 新邮箱（账户）
         /// </summary>
         [EmailAddress]
         [Required(ErrorMessage = "新邮箱必填")]
-        public string? NewEmail { get; set; }
+        public required string NewEmail { get; set; }
 
         /// <summary>
         /// 新密码
         /// </summary>
         [Required(ErrorMessage ="新密码必填")]
-        public string? NewPassword { get; set; }
+        public required string NewPassword { get; set; }
     }
 }
