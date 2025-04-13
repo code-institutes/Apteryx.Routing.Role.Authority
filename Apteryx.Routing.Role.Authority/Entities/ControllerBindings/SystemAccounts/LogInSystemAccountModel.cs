@@ -18,5 +18,18 @@ namespace Apteryx.Routing.Role.Authority
         /// </summary>
         [Required(ErrorMessage = "密码必填")]
         public string? Password { get; set; }
+
+        /// <summary>
+        /// 验证类型
+        /// </summary>
+        [Required(ErrorMessage = "验证类型必填")]
+        public CaptchaType? CaptchaType { get; set; }
+
+        /// <summary>
+        /// 验证码
+        /// </summary>
+        [Required(ErrorMessage = "验证码必填")]
+        public string? CaptchaCode { get; set; }
+        
     }
 }

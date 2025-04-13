@@ -1,4 +1,5 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using apteryx.common.extend.Helpers;
+using Apteryx.MongoDB.Driver.Extend;
 using Apteryx.Routing.Role.Authority.Attributes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -27,8 +28,10 @@ namespace Apteryx.Routing.Role.Authority
         /// <returns></returns>
         public static IServiceCollection AddApteryxAuthority(this IServiceCollection services, ApteryxConfig config)
         {
-            if (config.MongoDBOptions == null)
-                throw new Exception("“MongoDBOptions”配置不能为空！");
+            //if (config.MongoDBOptions == null)
+            //    throw new Exception("“MongoDBOptions”配置不能为空！");
+            if (config.MongoDBOptions.ConnectionString.IsNullOrWhiteSpace())
+                throw new Exception("“MongoDBOptions.ConnectionString”配置不能为空！");
             if (config.TokenConfig == null)
                 throw new Exception("“TokenConfig”配置不能为空！");
             if (config.UseSecurityToken)
@@ -153,6 +156,8 @@ namespace Apteryx.Routing.Role.Authority
 
             services.AddScoped<ApteryxInitializeDataService>();
             services.AddScoped<ApteryxOperationLogService>();
+            services.AddDistributedMemoryCache();
+
             return services;
         }
     }

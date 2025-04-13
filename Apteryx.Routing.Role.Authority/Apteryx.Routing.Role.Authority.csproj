@@ -25,6 +25,7 @@
 		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="3.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />

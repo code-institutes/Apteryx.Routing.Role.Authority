@@ -25,6 +25,6 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// MongoDB连接配置
         /// </summary>
-        public MongoDBOptions? MongoDBOptions { get; set; }
+        public required MongoDBOptions MongoDBOptions { get; set; }
     }
 }

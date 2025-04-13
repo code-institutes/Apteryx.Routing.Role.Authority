@@ -2,6 +2,7 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -23,6 +24,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         private readonly ApteryxDbContext _db;
         private readonly ApteryxConfig _jwtConfig;
         private readonly ApteryxOperationLogService _log;
+        private readonly IDistributedCache _cache;
 
         /// <summary>
         /// 
@@ -30,11 +32,12 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         /// <param name="jwtConfig"></param>
         /// <param name="mongoDbContext"></param>
         /// <param name="logService"></param>
-        public SystemAccountController(ApteryxConfig jwtConfig, ApteryxDbContext mongoDbContext, ApteryxOperationLogService logService)
+        public SystemAccountController(ApteryxConfig jwtConfig, ApteryxDbContext mongoDbContext, ApteryxOperationLogService logService, IDistributedCache cache)
         {
             this._db = mongoDbContext;
             this._jwtConfig = jwtConfig;
             this._log = logService;
+            this._cache = cache;
         }
 
         /// <summary>
@@ -54,6 +57,13 @@ namespace Apteryx.Routing.Role.Authority.Controllers
         [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
         public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
         {
+
+            var cachedCode = await _cache.GetStringAsync($"Captcha_{CaptchaType.Login}_{model.Email}");
+            if (string.IsNullOrEmpty(cachedCode) || cachedCode != model.CaptchaCode?.ToUpper())
+            {
+                return Ok(ApteryxResultApi.Fail(ApteryxCodes.验证码错误, "验证码错误或已过期，请重试"));
+            }
+
             var pwd = model.Password.ToSHA1();
             var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
             if (account == null)
