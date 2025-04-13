@@ -11,7 +11,7 @@ namespace Apteryx.Routing.Role.Authority.Services
 {
     public class CaptchaService
     {
-        private static readonly char[] AllowedChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
+        private static readonly char[] AllowedChars = "ACDEFGHJKLMNPQRSUVWXY23456789".ToCharArray();
         private readonly IDistributedCache _cache;
 
         public CaptchaService(IDistributedCache cache)
@@ -21,10 +21,10 @@ namespace Apteryx.Routing.Role.Authority.Services
 
         public async Task<(string Code, byte[] ImageBytes)> GenerateCaptchaAsync(string key, CaptchaType type)
         {
-            int width = 150, height = 50;
+            int width = 120, height = 50;
             var random = new Random();
             string captchaCode = new string(
-                Enumerable.Range(0, 5)
+                Enumerable.Range(0, 4)
                           .Select(_ => AllowedChars[random.Next(AllowedChars.Length)])
                           .ToArray());
 
