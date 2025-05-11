@@ -14,12 +14,9 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<ApplicationIcon>logo.png</ApplicationIcon>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Content Include="logo.png" />
-	</ItemGroup>
+
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
