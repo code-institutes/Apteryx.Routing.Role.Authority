@@ -86,8 +86,8 @@ namespace Apteryx.Routing.Role.Authority.Services
             int height = sourceImage.Height;
             var result = new Image<Rgba32>(width, height);
 
-            float ampX = 5f, freqX = 2f;
-            float ampY = 3f, freqY = 2f;
+            float ampX = 3f, freqX = 2f;
+            float ampY = 1.5f, freqY = 2f;
 
             for (int y = 0; y < height; y++)
             {

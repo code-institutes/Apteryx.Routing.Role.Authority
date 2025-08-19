@@ -30,7 +30,7 @@ namespace Apteryx.Routing.Role.Authority.Controllers
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "获取指定日志信息",
+            Summary = "获取验证码图片",
             OperationId = "Get",
             Tags = new[] { "Captcha" }
         )]
