@@ -4,6 +4,7 @@ namespace Apteryx.Routing.Role.Authority
 {
     public class Route:BaseMongoEntity
     {
+        public required string ServiceName { get; set; }
         public required string CtrlName { get; set; }
         public required string Method { get; set; }
         public required string Path { get; set; }
