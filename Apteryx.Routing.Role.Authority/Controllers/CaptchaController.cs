@@ -1,14 +1,15 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using apteryx.common.extend.Helpers;
+using Apteryx.MongoDB.Driver.Extend;
+using Apteryx.Routing.Role.Authority.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Swashbuckle.AspNetCore.Annotations;
-using MongoDB.Driver;
-using apteryx.common.extend.Helpers;
-using MongoDB.Bson;
-using Apteryx.Routing.Role.Authority.Services;
 using Microsoft.Extensions.Caching.Distributed;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Reflection;
 
 namespace Apteryx.Routing.Role.Authority.Controllers
 {

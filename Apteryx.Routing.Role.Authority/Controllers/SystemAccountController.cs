@@ -57,7 +57,6 @@ public class SystemAccountController : Controller
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
     public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
     {
-
         var cachedCode = await _cache.GetStringAsync($"Captcha_{CaptchaType.Login}_{model.Email}");
         if (string.IsNullOrEmpty(cachedCode) || cachedCode != model.CaptchaCode?.ToUpper())
         {
@@ -78,7 +77,10 @@ public class SystemAccountController : Controller
 
         var token = new TokenBuilder()
             .AddAudience(_jwtConfig.TokenConfig.Audience)
-            .AddClaim(ClaimTypes.Name, account.Id)
+            .AddClaim(ClaimTypes.Sid, account.Id)
+            .AddClaim(ClaimTypes.Name, account.Name)
+            .AddClaim(ClaimTypes.Role, role.Id)
+            .AddClaim(ClaimTypes.Email, account.Email)
             .AddSubject(Guid.NewGuid().ToString())
             .AddExpiry(_jwtConfig.TokenConfig.Expires)
             .AddIssuer(_jwtConfig.TokenConfig.Issuer)

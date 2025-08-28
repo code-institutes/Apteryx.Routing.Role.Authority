@@ -46,4 +46,18 @@ public class LogController : ControllerBase
     {
         return await _log.Query(model);
     }
+
+    [HttpGet("all/{dataId}")]
+    [SwaggerOperation(
+        Summary = "获取全部",
+        OperationId = "GetAll",
+        Tags = new[] { "Log" }
+    )]
+    [ApiRoleDescription("C", "获取全部")]
+    [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<PageList<OperationLog>>))]
+    public async Task<IApteryxResult> GetAll([SwaggerParameter("数据ID（Mongo文档ID）", Required = true)] string dataId)
+    {
+        var result = await _log.GetAllAsync(dataId);
+        return ApteryxResultApi.Susuccessful(result.OrderBy(o=>o.CreateTime).ToList());
+    }
 }

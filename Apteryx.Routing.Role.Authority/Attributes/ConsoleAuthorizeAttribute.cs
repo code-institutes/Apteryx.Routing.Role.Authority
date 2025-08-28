@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using MongoDB.Driver;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -124,7 +125,7 @@ namespace Apteryx.Routing.Role.Authority
 
             if (httpContext.User.Identity != null && !httpContext.User.Identity.Name.IsNullOrWhiteSpace())
             {
-                var accountId = httpContext.User.Identity.Name;
+                var accountId = httpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
                 callLog.IdentityName = accountId;
                 callLog.SystemAccount = _db.ApteryxSystemAccount.FindOne(accountId);
             }
@@ -162,7 +163,7 @@ namespace Apteryx.Routing.Role.Authority
             {
                 var method = context.HttpContext.Request.Method;
                 var template = $"/{context.ActionDescriptor.AttributeRouteInfo?.Template}";
-                var accountId = context.HttpContext.User.Identity.Name;
+                var accountId = context.HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
 
                 var systemAccount = _db.ApteryxSystemAccount.FindOne(f => f.Id == accountId);
                 if (systemAccount == null)

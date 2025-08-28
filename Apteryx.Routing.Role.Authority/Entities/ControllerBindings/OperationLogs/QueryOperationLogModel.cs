@@ -37,5 +37,9 @@
         /// 
         /// </summary>
         public string? ActionMethod { get; set; }
+        /// <summary>
+        /// 数据ID（Mongo文档ID）
+        /// </summary>
+        public string? DataId {  get; set; }
     }
 }

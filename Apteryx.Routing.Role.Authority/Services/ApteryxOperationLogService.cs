@@ -1,4 +1,5 @@
 ﻿using apteryx.common.extend.Helpers;
+using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 
@@ -14,7 +15,8 @@ namespace Apteryx.Routing.Role.Authority
             this._httpContext = httpContextAccessor;
         }
 
-        public async Task CreateAsync<T>(T? newData, T? oldData, string? remarks = null)
+        public async Task CreateAsync<T>(T? newData, T? oldData, string? remarks = null, string? operationRecordText = null)
+            where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
             var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
@@ -22,8 +24,7 @@ namespace Apteryx.Routing.Role.Authority
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
-
-            await _db.ApteryxOperationLog.AddAsync(new OperationLog(
+            var log = new OperationLog(
                     callLog.TraceIdentifier,
                     actDesc.ActionDescriptorId,
                     actDesc.GroupName,
@@ -34,12 +35,17 @@ namespace Apteryx.Routing.Role.Authority
                     callLog.Request.Method,
                     actDesc.Template,
                     remarks,
+                    operationRecordText,
                     systemAccount,
+                    newData?.Id ?? oldData?.Id,
                     typeof(T).FullName,
                     newData?.ToJson(),
-                    oldData?.ToJson()));
+                    oldData?.ToJson());
+            log.DataId = newData?.Id ?? oldData?.Id;
+            await _db.ApteryxOperationLog.AddAsync(log);
         }
-        public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null)
+        public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null, string? operationRecordText = null)
+            where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
             var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
@@ -47,8 +53,7 @@ namespace Apteryx.Routing.Role.Authority
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
-
-            await _db.ApteryxOperationLog.AddAsync(clientSession, new OperationLog(
+            var log = new OperationLog(
                     callLog.TraceIdentifier,
                     actDesc.ActionDescriptorId,
                     actDesc.GroupName,
@@ -59,10 +64,13 @@ namespace Apteryx.Routing.Role.Authority
                     callLog.Request.Method,
                     actDesc.Template,
                     remarks,
+                    operationRecordText,
                     systemAccount,
+                    newData?.Id ?? oldData?.Id,
                     typeof(T).FullName,
                     newData?.ToJson(),
-                    oldData?.ToJson()));
+                    oldData?.ToJson());
+            await _db.ApteryxOperationLog.AddAsync(clientSession, log);
         }
 
         public async Task<IApteryxResult> GetAsync(string id)
@@ -73,6 +81,12 @@ namespace Apteryx.Routing.Role.Authority
             return ApteryxResultApi.Susuccessful(log);
         }
 
+        public async Task<List<OperationLog>> GetAllAsync(string dataId)
+        {
+            var logs = await _db.ApteryxOperationLog.Where(w => w.DataId == dataId).ToListAsync();
+            return logs;
+        }
+
         public async Task<IApteryxResult> Query(QueryOperationLogModel model)
         {
             var query = _db.ApteryxOperationLog.AsMongoCollection.AsQueryable().AsQueryable();
@@ -81,6 +95,9 @@ namespace Apteryx.Routing.Role.Authority
 
             if (model.GroupId != null && !model.GroupId.IsNullOrWhiteSpace())
                 query = query.Where(query => query.GroupId == model.GroupId);
+
+            if (model.DataId != null && !model.DataId.IsNullOrWhiteSpace())
+                query = query.Where(w => w.DataId == model.DataId);
 
             if (model.AccountId != null && !model.AccountId.IsNullOrWhiteSpace())
                 query = query.Where(w => w.SystemAccount.Id == model.AccountId);

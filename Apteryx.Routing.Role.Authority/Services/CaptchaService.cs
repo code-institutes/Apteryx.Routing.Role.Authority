@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Reflection;
 
 namespace Apteryx.Routing.Role.Authority.Services
 {
@@ -17,6 +18,65 @@ namespace Apteryx.Routing.Role.Authority.Services
         {
             _cache = cache;
         }
+
+        //public async Task<(string Code, byte[] ImageBytes)> GenerateCaptchaAsync(string key, CaptchaType type)
+        //{
+        //    int width = 120, height = 50;
+        //    var random = new Random();
+        //    string captchaCode = new string(
+        //        Enumerable.Range(0, 4)
+        //                  .Select(_ => AllowedChars[random.Next(AllowedChars.Length)])
+        //                  .ToArray());
+
+        //    using var image = new Image<Rgba32>(width, height);
+        //    image.Mutate(ctx =>
+        //    {
+        //        ctx.Fill(Color.White);
+
+        //        // 彩色干扰线
+        //        for (int i = 0; i < 5; i++)
+        //        {
+        //            var start = new PointF(random.Next(width), random.Next(height));
+        //            var end = new PointF(random.Next(width), random.Next(height));
+        //            var path = new PathBuilder().AddLine(start, end).Build();
+        //            var lineColor = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+        //            ctx.Draw(lineColor, 1.5f, path);
+        //        }
+
+        //        // 绘制验证码文本（每个字符不同颜色和 Y 方向抖动）
+        //        Font font = SystemFonts.CreateFont("Arial", 28, FontStyle.Bold);
+        //        for (int i = 0; i < captchaCode.Length; i++)
+        //        {
+        //            var charColor = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+        //            var charText = captchaCode[i].ToString();
+        //            var position = new PointF(20 + i * 24, 10 + random.Next(-5, 5)); // 上下抖动
+        //            ctx.DrawText(charText, font, charColor, position);
+        //        }
+
+        //        // 彩色噪点
+        //        for (int i = 0; i < 300; i++)
+        //        {
+        //            var color = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+        //            var pos = new PointF(random.Next(width), random.Next(height));
+        //            var ellipse = new EllipsePolygon(pos, new SizeF(1, 1));
+        //            ctx.Fill(color, ellipse);
+        //        }
+        //    });
+
+        //    // 图像变形处理（双轴波动）
+        //    using var distortedImage = ApplyWaveDistortion2D(image);
+        //    using var ms = new MemoryStream();
+        //    distortedImage.SaveAsPng(ms);
+
+        //    // 缓存验证码文本
+        //    var cacheOptions = new DistributedCacheEntryOptions
+        //    {
+        //        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
+        //    };
+        //    await _cache.SetStringAsync($"Captcha_{type}_{key}", captchaCode, cacheOptions);
+
+        //    return (captchaCode, ms.ToArray());
+        //}
 
         public async Task<(string Code, byte[] ImageBytes)> GenerateCaptchaAsync(string key, CaptchaType type)
         {
@@ -42,8 +102,14 @@ namespace Apteryx.Routing.Role.Authority.Services
                     ctx.Draw(lineColor, 1.5f, path);
                 }
 
+                // 从嵌入资源加载字体
+                var fontCollection = new FontCollection();
+                var fontPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Resources", "Fonts", "DejaVuSans.ttf");
+                var fontFamily = fontCollection.Add(File.OpenRead(fontPath));
+                // 3. 从 FontFamily 创建 Font
+                Font font = fontFamily.CreateFont(28, FontStyle.Bold);
                 // 绘制验证码文本（每个字符不同颜色和 Y 方向抖动）
-                Font font = SystemFonts.CreateFont("Arial", 28, FontStyle.Bold);
+                //Font font = SystemFonts.CreateFont("Arial", 28, FontStyle.Bold);
                 for (int i = 0; i < captchaCode.Length; i++)
                 {
                     var charColor = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
@@ -60,6 +126,7 @@ namespace Apteryx.Routing.Role.Authority.Services
                     var ellipse = new EllipsePolygon(pos, new SizeF(1, 1));
                     ctx.Fill(color, ellipse);
                 }
+
             });
 
             // 图像变形处理（双轴波动）

@@ -25,6 +25,7 @@ public class ApteryxInitializeDataService
         _db.ApteryxSystemAccount.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<SystemAccount>(Builders<SystemAccount>.IndexKeys.Ascending(f => f.Email).Ascending(f => f.Password)));
 
         _db.ApteryxOperationLog.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupId)));
+        _db.ApteryxOperationLog.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.DataId)));
         _db.ApteryxOperationLog.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupName)));
         _db.ApteryxOperationLog.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.Remarks)));
         _db.ApteryxOperationLog.AsMongoCollection.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionMethod)));
