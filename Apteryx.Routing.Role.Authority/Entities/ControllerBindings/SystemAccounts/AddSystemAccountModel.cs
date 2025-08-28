@@ -7,6 +7,9 @@ namespace Apteryx.Routing.Role.Authority
     /// </summary>
     public class AddSystemAccountModel
     {
+        [Phone]
+        [Required(ErrorMessage = "手机必填")]
+        public required string Phone { get; set; }
         /// <summary>
         /// 姓名
         /// </summary>

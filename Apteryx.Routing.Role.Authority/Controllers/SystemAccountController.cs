@@ -57,14 +57,16 @@ public class SystemAccountController : Controller
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Token<ResultSystemAccountRoleModel>>))]
     public async Task<IActionResult> LogIn([FromBody] LogInSystemAccountModel model)
     {
-        var cachedCode = await _cache.GetStringAsync($"Captcha_{CaptchaType.Login}_{model.Email}");
+        var cachedCode = await _cache.GetStringAsync($"Captcha_{CaptchaType.Login}_{model.PhoneOrEmail}");
         if (string.IsNullOrEmpty(cachedCode) || cachedCode != model.CaptchaCode?.ToUpper())
         {
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.验证码错误, "验证码错误或已过期，请重试"));
         }
 
         var pwd = model.Password.ToSHA1();
-        var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Email == model.Email && f.Password == pwd);
+        var account = await _db.ApteryxSystemAccount.FindOneAsync(f =>
+        f.Phone == model.PhoneOrEmail && f.Password == pwd ||
+        f.Email == model.PhoneOrEmail && f.Password == pwd);
         if (account == null)
         {
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账号或密码错误));
@@ -119,6 +121,10 @@ public class SystemAccountController : Controller
         if (check != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
+        check = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Phone == model.Phone);
+        if (check != null)
+            return Ok(ApteryxResultApi.Fail(ApteryxCodes.手机已被注册, "已存在该手机的账户"));
+
 
         var role = await _db.ApteryxRole.FindOneAsync(f => f.Id == model.RoleId);
         if (role == null)
@@ -127,6 +133,7 @@ public class SystemAccountController : Controller
         var account = new SystemAccount()
         {
             Id = ObjectId.GenerateNewId().ToString(),
+            Phone = model.Phone,
             Name = model.Name,
             Email = email,
             Password = pwd.ToSHA1(),
@@ -167,6 +174,7 @@ public class SystemAccountController : Controller
     {
         var accountId = model.Id?.Trim();
         var name = model.Name?.Trim();
+        var phone = model.Phone?.Trim();
         var email = model.Email?.Trim();
         var pwd = model.Password?.Trim();
         var roleId = model.RoleId?.Trim();
@@ -174,6 +182,9 @@ public class SystemAccountController : Controller
         var account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id != accountId && f.Email == email);
         if (account != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, $"已存在邮箱为：“{email}”的账户"));
+        account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id != accountId && f.Phone == model.Phone);
+        if (account != null)
+            return Ok(ApteryxResultApi.Fail(ApteryxCodes.手机已被注册, $"已存在手机为：“{model.Phone}”的账户"));
 
         account = await _db.ApteryxSystemAccount.FindOneAsync(f => f.Id == accountId);
         if (account == null)
@@ -187,6 +198,7 @@ public class SystemAccountController : Controller
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{roleId}”"));
 
         account.Name = name;
+        account.Phone = phone;
         account.RoleId = roleId;
         account.Email = email;
         account.Password = pwd.ToSHA1();

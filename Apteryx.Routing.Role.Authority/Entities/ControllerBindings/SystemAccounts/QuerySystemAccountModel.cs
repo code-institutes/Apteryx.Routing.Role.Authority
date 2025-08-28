@@ -10,6 +10,10 @@
         /// </summary>
         public string? Name { get; set; }
         /// <summary>
+        /// 手机
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
         /// 电子邮件
         /// </summary>
         public string? Email { get; set; }

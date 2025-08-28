@@ -69,6 +69,7 @@ public class ApteryxInitializeDataService
 
             _db.ApteryxSystemAccount.Add(new SystemAccount()
             {
+                Phone = "18611515159",
                 Name = "super admin",
                 Email = "wyspaces@outlook.com",
                 Password = "admin1234".ToSHA1(),

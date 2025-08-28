@@ -8,7 +8,6 @@ Nuget/
 *.pdb
 *.tmp
 *.log
-*.ttf
 *.png
 *.xml
 *.jpg

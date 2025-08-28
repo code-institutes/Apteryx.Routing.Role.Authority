@@ -10,9 +10,8 @@ namespace Apteryx.Routing.Role.Authority
         /// <summary>
         /// 邮箱
         /// </summary>
-        [EmailAddress]
-        [Required(ErrorMessage = "邮箱必填")]
-        public string? Email { get; set; }
+        [Required(ErrorMessage = "手机/邮箱必填")]
+        public string? PhoneOrEmail { get; set; }
         /// <summary>
         /// 密码
         /// </summary>

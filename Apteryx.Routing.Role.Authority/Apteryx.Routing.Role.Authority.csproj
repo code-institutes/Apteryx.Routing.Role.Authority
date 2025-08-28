@@ -16,6 +16,16 @@
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Remove="Resources\Fonts\DejaVuSans.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\Fonts\DejaVuSans.ttf">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 
 
 	<ItemGroup>

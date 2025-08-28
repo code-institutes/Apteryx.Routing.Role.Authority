@@ -8,7 +8,11 @@ namespace Apteryx.Routing.Role.Authority;
 public class SystemAccount : BaseMongoEntity
 {
     /// <summary>
-    /// 
+    /// 手机
+    /// </summary>
+    public required string Phone { get; set; }
+    /// <summary>
+    /// 姓名
     /// </summary>
     public required string Name { get; set; }
     /// <summary>
