@@ -20,8 +20,8 @@ namespace Apteryx.Routing.Role.Authority
             where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.ApteryxCallLog.Immediate.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.Commands.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.Commands.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
@@ -43,14 +43,14 @@ namespace Apteryx.Routing.Role.Authority
                     newData?.ToJson(),
                     oldData?.ToJson());
             log.DataId = newData?.Id ?? oldData?.Id;
-            await _db.ApteryxOperationLog.Immediate.InsertAsync(log);
+            await _db.ApteryxOperationLog.Commands.InsertAsync(log);
         }
         public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null, string? operationRecordText = null)
             where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.ApteryxCallLog.Immediate.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.Commands.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.Commands.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
@@ -71,12 +71,12 @@ namespace Apteryx.Routing.Role.Authority
                     typeof(T).FullName,
                     newData?.ToJson(),
                     oldData?.ToJson());
-            await _db.ApteryxOperationLog.Immediate.InsertAsync(clientSession, log);
+            await _db.ApteryxOperationLog.Commands.InsertAsync(clientSession, log);
         }
 
         public async Task<IApteryxResult> GetAsync(string id)
         {
-            var log = await _db.ApteryxOperationLog.Immediate.FindOneAsync(id);
+            var log = await _db.ApteryxOperationLog.Commands.FindOneAsync(id);
             if (log == null)
                 return ApteryxResultApi.Fail(ApteryxCodes.操作日志不存在);
             return ApteryxResultApi.Susuccessful(log);
@@ -126,8 +126,8 @@ namespace Apteryx.Routing.Role.Authority
         //public async Task CreateAsync<T>(T? newData, T? oldData, string? remarks = null) where T : BaseMongoEntity
         //{
         //    var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-        //    var systemAccount = await _db.SystemAccounts.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-        //    var callLog = await _db.CallLogs.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+        //    var systemAccount = await _db.SystemAccounts.Commands.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+        //    var callLog = await _db.CallLogs.Commands.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
         //    if (callLog == null) { return; }
 
         //    var actDesc = callLog.ActionDescriptor;

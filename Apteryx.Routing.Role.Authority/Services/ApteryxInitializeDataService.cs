@@ -43,15 +43,15 @@ public class ApteryxInitializeDataService
         //刷新路由
         RefreshRoute();
 
-        var route = _db.ApteryxRoute.Immediate.FindAll();
+        var route = _db.ApteryxRoute.Commands.FindAll();
 
         var routeIds = route.Select(r => r.Id).ToList();
 
         //创建账户
-        var act = _db.ApteryxSystemAccount.Immediate.FindAll();
+        var act = _db.ApteryxSystemAccount.Commands.FindAll();
         if (!act.Any())
         {
-            var role = _db.ApteryxRole.Immediate.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序);
+            var role = _db.ApteryxRole.Commands.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序);
             if (role == null)
             {
 
@@ -64,10 +64,10 @@ public class ApteryxInitializeDataService
                     Id = ObjectId.GenerateNewId().ToString(),
                     RouteIds = routeIds
                 };
-                _db.ApteryxRole.Immediate.Insert(role);
+                _db.ApteryxRole.Commands.Insert(role);
             }
 
-            _db.ApteryxSystemAccount.Immediate.Insert(new SystemAccount()
+            _db.ApteryxSystemAccount.Commands.Insert(new SystemAccount()
             {
                 Phone = "18611515159",
                 Name = "super admin",
@@ -79,8 +79,8 @@ public class ApteryxInitializeDataService
         }
         else
         {
-            var role = _db.ApteryxRole.Immediate.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序 || f.Name == "超管" && f.AddType == AddTypes.程序);
-            _db.ApteryxRole.Immediate.UpdateOne(u => u.Id == role.Id, Builders<Role>.Update.Set(s => s.RouteIds, routeIds));
+            var role = _db.ApteryxRole.Commands.FindOne(f => f.Name == "管理员" && f.AddType == AddTypes.程序 || f.Name == "超管" && f.AddType == AddTypes.程序);
+            _db.ApteryxRole.Commands.UpdateOne(u => u.Id == role.Id, Builders<Role>.Update.Set(s => s.RouteIds, routeIds));
         }
     }
 
@@ -149,18 +149,18 @@ public class ApteryxInitializeDataService
                 route.Name = validRoute.Name;
                 route.Description = validRoute.Description;
                 route.Path = validRoute.Path;
-                _db.ApteryxRoute.Immediate.ReplaceOne(r => r.Id == route.Id, route);
+                _db.ApteryxRoute.Commands.ReplaceOne(r => r.Id == route.Id, route);
                 arrRoutes.Remove(validRoute);
             }
             else
             {
-                _db.ApteryxRoute.Immediate.DeleteOne(d => d.Id == route.Id);
+                _db.ApteryxRoute.Commands.DeleteOne(d => d.Id == route.Id);
                 //将路由从所有角色中删除
-                _db.ApteryxRole.Immediate.UpdateMany(u => u.RouteIds.Contains(route.Id), Builders<Role>.Update.Pull(p => p.RouteIds, route.Id));
+                _db.ApteryxRole.Commands.UpdateMany(u => u.RouteIds.Contains(route.Id), Builders<Role>.Update.Pull(p => p.RouteIds, route.Id));
             }
         }
 
         if (arrRoutes.Any())
-            _db.ApteryxRoute.Immediate.InsertMany(arrRoutes);
+            _db.ApteryxRoute.Commands.InsertMany(arrRoutes);
     }
 }

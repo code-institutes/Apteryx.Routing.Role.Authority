@@ -64,7 +64,7 @@ public class SystemAccountController : Controller
         }
 
         var pwd = model.Password.ToSHA1();
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f =>
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f =>
         f.Phone == model.PhoneOrEmail && f.Password == pwd ||
         f.Email == model.PhoneOrEmail && f.Password == pwd);
         if (account == null)
@@ -75,7 +75,7 @@ public class SystemAccountController : Controller
         if (!account.State)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户已被禁用));
 
-        var role = await _db.ApteryxRole.Immediate.FindOneAsync(f => f.Id == account.RoleId);
+        var role = await _db.ApteryxRole.Commands.FindOneAsync(f => f.Id == account.RoleId);
 
         var token = new TokenBuilder()
             .AddAudience(_jwtConfig.TokenConfig.Audience)
@@ -117,16 +117,16 @@ public class SystemAccountController : Controller
         var pwd = model.Password.Trim();
 
 
-        var check = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Email == email);
+        var check = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Email == email);
         if (check != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
-        check = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Phone == model.Phone);
+        check = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Phone == model.Phone);
         if (check != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.手机已被注册, "已存在该手机的账户"));
 
 
-        var role = await _db.ApteryxRole.Immediate.FindOneAsync(f => f.Id == model.RoleId);
+        var role = await _db.ApteryxRole.Commands.FindOneAsync(f => f.Id == model.RoleId);
         if (role == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, "该角色不存在"));
 
@@ -139,7 +139,7 @@ public class SystemAccountController : Controller
             Password = pwd.ToSHA1(),
             RoleId = model.RoleId
         };
-        await _db.ApteryxSystemAccount.Immediate.InsertAsync(account);
+        await _db.ApteryxSystemAccount.Commands.InsertAsync(account);
         await _log.CreateAsync(account, null);
         return Ok(ApteryxResultApi.Susuccessful(account));
     }
@@ -155,7 +155,7 @@ public class SystemAccountController : Controller
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<SystemAccount>))]
     public async Task<IActionResult> Get([SwaggerParameter("账户ID", Required = false)] string id)
     {
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id == id);
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id == id);
         if (account == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
         return Ok(ApteryxResultApi.Susuccessful(account));
@@ -179,21 +179,21 @@ public class SystemAccountController : Controller
         var pwd = model.Password?.Trim();
         var roleId = model.RoleId?.Trim();
 
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id != accountId && f.Email == email);
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id != accountId && f.Email == email);
         if (account != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, $"已存在邮箱为：“{email}”的账户"));
-        account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id != accountId && f.Phone == model.Phone);
+        account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id != accountId && f.Phone == model.Phone);
         if (account != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.手机已被注册, $"已存在手机为：“{model.Phone}”的账户"));
 
-        account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id == accountId);
+        account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id == accountId);
         if (account == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
         if (account.IsSuper == true && account.Id != HttpContext.GetAccountId())
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
 
-        var role = await _db.ApteryxRole.Immediate.FindOneAsync(f => f.Id == roleId);
+        var role = await _db.ApteryxRole.Commands.FindOneAsync(f => f.Id == roleId);
         if (role == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.角色不存在, $"该角色不存在，RoleId：“{roleId}”"));
 
@@ -203,7 +203,7 @@ public class SystemAccountController : Controller
         account.Email = email;
         account.Password = pwd.ToSHA1();
 
-        var result = await _db.ApteryxSystemAccount.Immediate.FindOneAndReplaceOneAsync(f => f.Id == accountId, account);
+        var result = await _db.ApteryxSystemAccount.Commands.FindOneAndReplaceOneAsync(f => f.Id == accountId, account);
         await _log.CreateAsync(account, result);
 
         return Ok(ApteryxResultApi.Susuccessful(account));
@@ -223,20 +223,20 @@ public class SystemAccountController : Controller
         var accountId = HttpContext.GetAccountId();
 
         var oldpwd = model.OldPassword.ToSHA1();
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id == accountId && f.Email == model.OldEmail && f.Password == oldpwd);
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id == accountId && f.Email == model.OldEmail && f.Password == oldpwd);
         if (account == null)
         {
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账号或密码错误));
         }
 
-        var check = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Email == model.NewEmail.Trim() && f.Id != account.Id);
+        var check = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Email == model.NewEmail.Trim() && f.Id != account.Id);
         if (check != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.邮箱已被注册, "已存在该邮箱的账户"));
 
         account.Email = model.NewEmail.Trim();
         account.Password = model.NewPassword.Trim().ToSHA1();
 
-        var result = await _db.ApteryxSystemAccount.Immediate.FindOneAndUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
+        var result = await _db.ApteryxSystemAccount.Commands.FindOneAndUpdateOneAsync(u => u.Id == account.Id, Builders<SystemAccount>
             .Update
             .Set(s => s.Email, account.Email)
             .Set(s => s.Password, account.Password));
@@ -259,7 +259,7 @@ public class SystemAccountController : Controller
     {
         var id = model.Id;
 
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id == id);
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id == id);
         if (account == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
@@ -268,7 +268,7 @@ public class SystemAccountController : Controller
 
         account.State = !account.State;
 
-        var result = await _db.ApteryxSystemAccount.Immediate.FindOneAndUpdateOneAsync(u => u.Id == id, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
+        var result = await _db.ApteryxSystemAccount.Commands.FindOneAndUpdateOneAsync(u => u.Id == id, Builders<SystemAccount>.Update.Set(s => s.State, account.State));
         await _log.CreateAsync(account, result);
 
         return Ok(ApteryxResultApi.Susuccessful(account));
@@ -285,14 +285,14 @@ public class SystemAccountController : Controller
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult))]
     public async Task<IActionResult> Delete(string id)
     {
-        var account = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(f => f.Id == id);
+        var account = await _db.ApteryxSystemAccount.Commands.FindOneAsync(f => f.Id == id);
         if (account == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.账户不存在));
 
         if (account.IsSuper == true)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.禁止该操作, "禁止操作超管账户！"));
 
-        await _db.ApteryxSystemAccount.Immediate.DeleteOneAsync(f => f.Id == id);
+        await _db.ApteryxSystemAccount.Commands.DeleteOneAsync(f => f.Id == id);
         await _log.CreateAsync(null, account);
 
         return Ok(ApteryxResultApi.Susuccessful());
