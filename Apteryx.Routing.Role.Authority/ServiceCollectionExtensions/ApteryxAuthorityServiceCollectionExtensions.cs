@@ -1,17 +1,20 @@
 ﻿using apteryx.common.extend.Helpers;
 using Apteryx.MongoDB.Driver.Extend;
 using Apteryx.Routing.Role.Authority.Attributes;
+using Apteryx.Routing.Role.Authority.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
 
 namespace Apteryx.Routing.Role.Authority;
 
@@ -45,6 +48,7 @@ public static class ApteryxAuthorityServiceCollectionExtensions
         }).AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         services.AddMongoDB<ApteryxDbContext>(options =>
@@ -137,7 +141,8 @@ public static class ApteryxAuthorityServiceCollectionExtensions
             //c.IgnoreObsoleteProperties();
 
             c.ExampleFilters();
-            c.AddEnumsWithValuesFixFilters();
+            //c.AddEnumsWithValuesFixFilters();
+            
             c.OperationFilter<SecurityRequirementsOperationFilter>(false);
             // or use the generic method, e.g. c.OperationFilter<SecurityRequirementsOperationFilter<MyCustomAttribute>>();
 
@@ -149,12 +154,16 @@ public static class ApteryxAuthorityServiceCollectionExtensions
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey
             });
+            c.SchemaFilter<EnumDescriptionSchemaFilter>();
+            c.OperationFilter<EnumDescriptionOperationFilter>();
 
-            //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            //c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile));
+            var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFileName);
+            c.IncludeXmlComments(xmlFilePath);
         });
 
         services.AddScoped<ApteryxInitializeDataService>();
+        //services.AddHostedService<ApteryxInitializeDataService>();
         services.AddScoped<ApteryxOperationLogService>();
         services.AddDistributedMemoryCache();
 

@@ -1,13 +1,12 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Apteryx.Routing.Role.Authority;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerExamples();
@@ -52,6 +51,7 @@ builder.Services.AddCors(m => m.AddPolicy("any", a => a
             .AllowAnyHeader()
             .AllowCredentials()));
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -78,10 +78,8 @@ if (app.Environment.IsDevelopment())
     });
     app.UseApteryxSwaggerUI();
 }
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("any");
 app.MapControllers();
-
 app.Run();

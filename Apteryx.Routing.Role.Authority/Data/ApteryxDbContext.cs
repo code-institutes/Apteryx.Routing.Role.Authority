@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Apteryx.Routing.Role.Authority
 {
-    public class ApteryxDbContext : MongoDbProvider
+    public class ApteryxDbContext : MongoDbContext
     {
         public ApteryxDbContext(IOptionsMonitor<MongoDBOptions> options) : base(options) { }
         /// <summary>

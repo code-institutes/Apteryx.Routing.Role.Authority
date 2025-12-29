@@ -2,6 +2,7 @@
 using Apteryx.MongoDB.Driver.Extend;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Apteryx.Routing.Role.Authority
 {
@@ -19,8 +20,8 @@ namespace Apteryx.Routing.Role.Authority
             where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.ApteryxCallLog.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.Immediate.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
@@ -42,14 +43,14 @@ namespace Apteryx.Routing.Role.Authority
                     newData?.ToJson(),
                     oldData?.ToJson());
             log.DataId = newData?.Id ?? oldData?.Id;
-            await _db.ApteryxOperationLog.AddAsync(log);
+            await _db.ApteryxOperationLog.Immediate.InsertAsync(log);
         }
         public async Task CreateAsync<T>(IClientSessionHandle clientSession, T? newData, T? oldData, string? remarks = null, string? operationRecordText = null)
             where T : BaseMongoEntity
         {
             var traceIdentifier = _httpContext.HttpContext?.TraceIdentifier;
-            var systemAccount = await _db.ApteryxSystemAccount.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
-            var callLog = await _db.ApteryxCallLog.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
+            var systemAccount = await _db.ApteryxSystemAccount.Immediate.FindOneAsync(_httpContext.HttpContext?.GetAccountId());
+            var callLog = await _db.ApteryxCallLog.Immediate.FindOneAsync(f => f.TraceIdentifier == traceIdentifier);
             if (callLog == null) { return; }
 
             var actDesc = callLog.ActionDescriptor;
@@ -70,12 +71,12 @@ namespace Apteryx.Routing.Role.Authority
                     typeof(T).FullName,
                     newData?.ToJson(),
                     oldData?.ToJson());
-            await _db.ApteryxOperationLog.AddAsync(clientSession, log);
+            await _db.ApteryxOperationLog.Immediate.InsertAsync(clientSession, log);
         }
 
         public async Task<IApteryxResult> GetAsync(string id)
         {
-            var log = await _db.ApteryxOperationLog.FindOneAsync(id);
+            var log = await _db.ApteryxOperationLog.Immediate.FindOneAsync(id);
             if (log == null)
                 return ApteryxResultApi.Fail(ApteryxCodes.操作日志不存在);
             return ApteryxResultApi.Susuccessful(log);
@@ -89,7 +90,7 @@ namespace Apteryx.Routing.Role.Authority
 
         public async Task<IApteryxResult> Query(QueryOperationLogModel model)
         {
-            var query = _db.ApteryxOperationLog.AsMongoCollection.AsQueryable().AsQueryable();
+            var query = _db.ApteryxOperationLog.Native.AsQueryable().AsQueryable();
             if (model.GroupName != null && !model.GroupName.IsNullOrWhiteSpace())
                 query = query.Where(w => w.GroupName == model.GroupName);
 

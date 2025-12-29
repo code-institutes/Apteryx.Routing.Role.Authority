@@ -46,7 +46,7 @@ public class RouteController : ControllerBase
     {
         var path = model.Path.Trim();
         var method = model.Method.Trim();
-        var action = await _db.ApteryxRoute.FindOneAsync(f => f.Path == path && f.Method == method);
+        var action = await _db.ApteryxRoute.Immediate.FindOneAsync(f => f.Path == path && f.Method == method);
         if (action != null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由已存在));
 
@@ -62,7 +62,7 @@ public class RouteController : ControllerBase
             Tag = model.Tag.Trim(),
             Path = path
         };
-        await _db.ApteryxRoute.AddAsync(route);
+        await _db.ApteryxRoute.Immediate.InsertAsync(route);
         //记录日志
         await _log.CreateAsync(route, null);
         return Ok(ApteryxResultApi.Susuccessful(route));
@@ -83,14 +83,14 @@ public class RouteController : ControllerBase
         var path = model.Path.Trim();
         var method = model.Method.Trim();
 
-        var route = await _db.ApteryxRoute.FindOneAsync(f => f.Id == routeId);
+        var route = await _db.ApteryxRoute.Immediate.FindOneAsync(f => f.Id == routeId);
         if (route == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由不存在));
 
         if (route.AddType != AddTypes.人工)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由无权修改, "只能编辑手动添加的路由"));
 
-        var check = await _db.ApteryxRoute.FindOneAsync(f => f.Path == path && f.Method == method);
+        var check = await _db.ApteryxRoute.Immediate.FindOneAsync(f => f.Path == path && f.Method == method);
         if (check != null)
             if (check.Id != routeId)
                 return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由已存在, "已存在相同路由数据"));
@@ -100,7 +100,7 @@ public class RouteController : ControllerBase
         route.Method = method;
         route.Path = path;
 
-        var result = await _db.ApteryxRoute.FindOneAndReplaceOneAsync(f => f.Id == route.Id, route);
+        var result = await _db.ApteryxRoute.Immediate.FindOneAndReplaceOneAsync(f => f.Id == route.Id, route);
         //记录日志
         await _log.CreateAsync(route, result);
 
@@ -117,7 +117,7 @@ public class RouteController : ControllerBase
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<Route>))]
     public async Task<IActionResult> Get([SwaggerParameter("路由ID", Required = true)] string id)
     {
-        return Ok(ApteryxResultApi.Susuccessful(await _db.ApteryxRoute.FindOneAsync(f => f.Id == id)));
+        return Ok(ApteryxResultApi.Susuccessful(await _db.ApteryxRoute.Immediate.FindOneAsync(f => f.Id == id)));
     }
 
     [HttpDelete]
@@ -132,16 +132,16 @@ public class RouteController : ControllerBase
     public async Task<IActionResult> Delete([SwaggerParameter("路由ID", Required = true)] string id)
     {
         var sysAccountId = HttpContext.GetAccountId();
-        var route = await _db.ApteryxRoute.FindOneAsync(f => f.Id == id);
+        var route = await _db.ApteryxRoute.Immediate.FindOneAsync(f => f.Id == id);
         if (route == null)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由不存在));
         if (route.AddType != AddTypes.人工)
             return Ok(ApteryxResultApi.Fail(ApteryxCodes.路由无权删除, "只能删除手动添加的路由"));
 
         //将路由从所有角色中解除关联
-        await _db.ApteryxRole.UpdateManyAsync(u => u.RouteIds.Contains(id), Builders<Role>.Update.Pull(p => p.RouteIds, id));
+        await _db.ApteryxRole.Immediate.UpdateManyAsync(u => u.RouteIds.Contains(id), Builders<Role>.Update.Pull(p => p.RouteIds, id));
         //删除路由
-        var result = await _db.ApteryxRoute.FindOneAndDeleteAsync(d => d.Id == id);
+        var result = await _db.ApteryxRoute.Immediate.FindOneAndDeleteAsync(d => d.Id == id);
         //记录日志
         await _log.CreateAsync(null, result);
 
@@ -162,7 +162,7 @@ public class RouteController : ControllerBase
         var method = model.Method;
         var path = model.Path;
 
-        var query = _db.ApteryxRoute.AsMongoCollection.AsQueryable().AsQueryable();
+        var query = _db.ApteryxRoute.AsQueryable();
         if (!model.IsShowMustHave)
             query = query.Where(w => w.IsMustHave == false);
 
@@ -190,7 +190,7 @@ public class RouteController : ControllerBase
     [SwaggerResponse((int)ApteryxCodes.请求成功, null, typeof(ApteryxResult<IEnumerable<Route>>))]
     public IActionResult GetAll()
     {
-        return Ok(ApteryxResultApi.Susuccessful(_db.ApteryxRoute.FindAll()));
+        return Ok(ApteryxResultApi.Susuccessful(_db.ApteryxRoute.Immediate.FindAll()));
     }
 
 
@@ -209,7 +209,7 @@ public class RouteController : ControllerBase
     {
         _initDataService.RefreshRoute();
 
-        var item = _db.ApteryxRoute.FindAll().GroupBy(g => g.CtrlName).Select(s => new ResultGroupRouteModel()
+        var item = _db.ApteryxRoute.Immediate.FindAll().GroupBy(g => g.CtrlName).Select(s => new ResultGroupRouteModel()
         {
             CtrlName = s.Key,
             Routes = s.Select(ss => ss)
