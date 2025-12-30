@@ -20,9 +20,15 @@ public class EnumDescriptionOperationFilter : IOperationFilter
         {
             var type = apiParam.Type;
 
-            // 可空枚举处理
-            if (Nullable.GetUnderlyingType(type) is Type underlying)
+            // 有些参数（尤其是某些绑定源、FromServices 等）Type 可能为 null
+            if (type == null)
+                continue;
+
+            // 可空枚举处理：先拿 underlying，再覆盖
+            var underlying = Nullable.GetUnderlyingType(type);
+            if (underlying != null)
                 type = underlying;
+
 
             if (!type.IsEnum)
                 continue;
