@@ -1,0 +1,22 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <_Apteryx_Tfm>$(TargetFramework)</_Apteryx_Tfm>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Apteryx_Xml Include="$(MSBuildThisFileDirectory)..\lib\$(_Apteryx_Tfm)\Apteryx.Routing.Role.Authority.xml" />
+  </ItemGroup>
+
+  <Target Name="CopyApteryxXmlToOutput"
+          AfterTargets="CopyFilesToOutputDirectory">
+    <Message Text="Copying Apteryx XML from @(Apteryx_Xml) to $(TargetDir)"
+             Importance="high" />
+
+    <Copy
+      SourceFiles="@(Apteryx_Xml)"
+      DestinationFolder="$(TargetDir)"
+      SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

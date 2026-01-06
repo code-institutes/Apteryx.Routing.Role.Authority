@@ -1,33 +1,33 @@
-﻿ <Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<!--<DocumentationFile>./Apteryx.Routing.Role.Authority.xml</DocumentationFile>-->
-		<!--<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>-->
 		<PackageProjectUrl>https://github.com/code-institutes/Apteryx.Routing.Role.Authority</PackageProjectUrl>
 		<Copyright>apteryx</Copyright>
-		<PackageVersion>1.0.1-rc-1204</PackageVersion>
+		<PackageVersion>1.0.1-rc-1202</PackageVersion>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DocumentationFile>Apteryx.Routing.Role.Authority.xml</DocumentationFile>
 	</PropertyGroup>
 
+	<!-- 打包 .targets -->
 	<ItemGroup>
-	  <None Remove="Resources\Fonts\DejaVuSans.ttf" />
+		<None Include="buildTransitive\Apteryx.Routing.Role.Authority.targets" Pack="true" PackagePath="buildTransitive\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Resources\Fonts\DejaVuSans.ttf">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+		<None Remove="Resources\Fonts\DejaVuSans.ttf" />
 	</ItemGroup>
 
-
+	<ItemGroup>
+		<Content Include="Resources\Fonts\DejaVuSans.ttf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
@@ -45,6 +45,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Apteryx.Routing.Role.Authority.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="logo.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
