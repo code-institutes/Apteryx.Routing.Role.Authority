@@ -1,10 +1,22 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.Mongodb.Driver.Extend;
+using Apteryx.MongoDB.Driver.Extend;
 
 namespace Apteryx.Routing.Role.Authority
 {
     /// <summary>
     /// 日志实体模型
     /// </summary>
+    [MongoIndex("GroupId:desc", Unique = false)]
+    [MongoIndex("DataId:desc", Unique = false)]
+    [MongoIndex("GroupName:desc", Unique = false)]
+    [MongoIndex("Remarks:desc", Unique = false)]
+    [MongoIndex("ActionMethod:desc", Unique = false)]
+    [MongoIndex("ActionName:desc", Unique = false)]
+    [MongoIndex("ActionDescription:desc", Unique = false)]
+    [MongoIndex("SystemAccount.Id:desc", Unique = false)]
+    [MongoIndex("ControllerName:desc", Unique = false)]
+    //[MongoIndex("Name:desc", "Email:desc", Unique = false)]
+    //[MongoIndex("CreateTime:asc", TtlSeconds = 3600)]
     public class OperationLog : BaseMongoEntity
     {
         /// <summary>

@@ -1,10 +1,14 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.Mongodb.Driver.Extend;
+using Apteryx.MongoDB.Driver.Extend;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json.Serialization;
 
 namespace Apteryx.Routing.Role.Authority;
 
+[MongoIndex("Phone:desc", "Password:desc", Unique = false)]
+[MongoIndex("Email:desc", "Password:desc", Unique = false)]
+//[MongoIndex("CreateTime:asc", TtlSeconds = 3600)]
 public class SystemAccount : BaseMongoEntity
 {
     /// <summary>

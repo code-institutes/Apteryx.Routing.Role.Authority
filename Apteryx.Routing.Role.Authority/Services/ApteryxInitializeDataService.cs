@@ -20,19 +20,19 @@ public class ApteryxInitializeDataService
         this.actionDescriptor = collectionProvider;
 
         //创建表索引
-        _db.ApteryxCallLog.Native.Indexes.CreateOne(new CreateIndexModel<CallLog>(Builders<CallLog>.IndexKeys.Ascending(f => f.TraceIdentifier)));
-        _db.ApteryxRoute.Native.Indexes.CreateOne(new CreateIndexModel<Route>(Builders<Route>.IndexKeys.Ascending(f => f.Path).Ascending(f => f.Method)));
-        _db.ApteryxSystemAccount.Native.Indexes.CreateOne(new CreateIndexModel<SystemAccount>(Builders<SystemAccount>.IndexKeys.Ascending(f => f.Email).Ascending(f => f.Password)));
+        //_db.ApteryxCallLog.Native.Indexes.CreateOne(new CreateIndexModel<CallLog>(Builders<CallLog>.IndexKeys.Ascending(f => f.TraceIdentifier)));
+        //_db.ApteryxRoute.Native.Indexes.CreateOne(new CreateIndexModel<Route>(Builders<Route>.IndexKeys.Ascending(f => f.Path).Ascending(f => f.Method)));
+        //_db.ApteryxSystemAccount.Native.Indexes.CreateOne(new CreateIndexModel<SystemAccount>(Builders<SystemAccount>.IndexKeys.Ascending(f => f.Email).Ascending(f => f.Password)));
 
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupId)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.DataId)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupName)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.Remarks)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionMethod)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionName)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionDescription)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.SystemAccount.Id)));
-        _db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ControllerName)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupId)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.DataId)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.GroupName)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.Remarks)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionMethod)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionName)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ActionDescription)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.SystemAccount.Id)));
+        //_db.ApteryxOperationLog.Native.Indexes.CreateOne(new CreateIndexModel<OperationLog>(Builders<OperationLog>.IndexKeys.Ascending(f => f.ControllerName)));
     }
 
     /// <summary>

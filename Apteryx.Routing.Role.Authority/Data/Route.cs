@@ -1,7 +1,9 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.Mongodb.Driver.Extend;
+using Apteryx.MongoDB.Driver.Extend;
 
 namespace Apteryx.Routing.Role.Authority
 {
+    [MongoIndex("Path:desc", "Method:desc", Unique = false)]
     public class Route:BaseMongoEntity
     {
         public required string ServiceName { get; set; }

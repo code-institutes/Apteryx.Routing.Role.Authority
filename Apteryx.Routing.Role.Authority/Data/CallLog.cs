@@ -1,7 +1,9 @@
-﻿using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.Mongodb.Driver.Extend;
+using Apteryx.MongoDB.Driver.Extend;
 
 namespace Apteryx.Routing.Role.Authority
 {
+    [MongoIndex("TraceIdentifier:desc", Unique = false)]
     public class CallLog : BaseMongoEntity
     {
         public required string TraceIdentifier { get; set; }
