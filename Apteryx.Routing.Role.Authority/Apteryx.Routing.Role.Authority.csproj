@@ -7,7 +7,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageProjectUrl>https://github.com/code-institutes/Apteryx.Routing.Role.Authority</PackageProjectUrl>
 		<Copyright>apteryx</Copyright>
-		<PackageVersion>1.0.1-rc-1203</PackageVersion>
+		<PackageVersion>1.0.1-rc-1209</PackageVersion>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
@@ -35,7 +35,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Apteryx.Common.Extend" Version="1.0.0" />
-		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="4.0.0-rc-1002" />
+		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="4.0.0-rc-1003" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />

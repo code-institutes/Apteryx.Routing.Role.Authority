@@ -1,5 +1,4 @@
-﻿using Apteryx.Mongodb.Driver.Extend;
-using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.MongoDB.Driver.Extend;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json.Serialization;

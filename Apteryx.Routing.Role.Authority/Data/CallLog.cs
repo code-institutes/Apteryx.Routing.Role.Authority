@@ -1,5 +1,4 @@
-﻿using Apteryx.Mongodb.Driver.Extend;
-using Apteryx.MongoDB.Driver.Extend;
+﻿using Apteryx.MongoDB.Driver.Extend;
 
 namespace Apteryx.Routing.Role.Authority
 {
