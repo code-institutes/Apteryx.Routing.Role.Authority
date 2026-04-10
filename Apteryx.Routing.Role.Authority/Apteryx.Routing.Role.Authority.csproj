@@ -36,11 +36,11 @@
 	<ItemGroup>
 		<PackageReference Include="Apteryx.Common.Extend" Version="1.0.0" />
 		<PackageReference Include="Apteryx.MongoDB.Driver.Extend" Version="4.0.0-rc-1003" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.7" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="10.0.1" />
 	</ItemGroup>
 
